@@ -2,7 +2,7 @@ name: ziggurat_sounds
 description: Provide sound support for [Ziggurat](https://github.com/chrisnorman7/ziggurat).
 version: 0.0.0
 publish_to: none
-# homepage: https://www.example.com
+# homepage: https://github.com/chrisnorman7/ziggurat_sounds
 
 environment:
   sdk: ">=2.14.0-377.7.beta <3.0.0"
@@ -14,5 +14,5 @@ dependencies:
     git: https://github.com/chrisnorman7/ziggurat
 
 dev_dependencies:
-  lints: ^1.0.0
+  pedantic: ^1.11.1
   test: ^1.16.0
