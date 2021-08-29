@@ -10,7 +10,7 @@ environment:
 dependencies:
   dart_synthizer:
     git: https://github.com/chrisnorman7/dart_synthizer
-  ziggurat: ^0.2.0
+  ziggurat: ^0.3.0
 
 dev_dependencies:
   pedantic: ^1.11.1
