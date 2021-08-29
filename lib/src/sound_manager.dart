@@ -89,8 +89,12 @@ class SoundManager {
         ..looping = event.looping
         ..gain = event.gain
         ..setBuffer(buffers.getBuffer(event.sound.name, event.sound.type));
+      if (event.keepAlive == false) {
+        generator.configDeleteBehavior(linger: true);
+      } else {
+        channel.sounds[event.id] = generator;
+      }
       channel.source.addGenerator(generator);
-      channel.sounds[event.id] = generator;
     } else if (event is DestroySound) {
       final channel = getChannel(event.channel);
       final sound = channel.sounds.remove(event.id);
