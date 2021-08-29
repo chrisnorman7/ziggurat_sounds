@@ -81,6 +81,14 @@ void main() {
       sound.destroy();
       await Future<void>.delayed(Duration.zero);
       expect(channelObject.sounds[sound.id], isNull);
+      sound = channel.playSound(SoundReference.file('looping.wav'),
+          looping: true, keepAlive: true);
+      expect(sound.looping, isTrue);
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(
+          channelObject.sounds[sound.id],
+          predicate(
+              (value) => value is BufferGenerator && value.looping == true));
     });
   });
 }
