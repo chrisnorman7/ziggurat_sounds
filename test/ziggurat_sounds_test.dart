@@ -8,10 +8,12 @@ import 'package:ziggurat/ziggurat.dart';
 import 'package:ziggurat_sounds/src/sound_manager.dart';
 import 'package:ziggurat_sounds/ziggurat_sounds.dart';
 
+import 'custom_buffer_store.dart';
+
 void main() {
   final synthizer = Synthizer()..initialize();
   final context = synthizer.createContext();
-  final buffers = BufferStore(Random(), synthizer);
+  final buffers = CustomBufferStore(Random(), synthizer);
   final game = Game('Sounds');
   final soundManager = SoundManager(context, buffers);
   game.sounds.listen(soundManager.handleEvent);
@@ -60,6 +62,21 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       expect(() => soundManager.getChannel(channel.id),
           throwsA(isA<NoSuchChannelError>()));
+    });
+    test('Sounds', () async {
+      final channel = game.createSoundChannel();
+      var sound = channel.playSound(SoundReference.file('test.wav'));
+      expect(sound.channel, equals(channel.id));
+      expect(sound.looping, isFalse);
+      expect(sound.keepAlive, isFalse);
+      await Future<void>.delayed(Duration.zero);
+      final channelObject = soundManager.getChannel(channel.id);
+      expect(channelObject.sounds[sound.id], isNull);
+      sound = channel.playSound(SoundReference.file('another.wav'),
+          keepAlive: true);
+      expect(sound.keepAlive, isTrue);
+      await Future<void>.delayed(Duration.zero);
+      expect(channelObject.sounds[sound.id], isA<BufferGenerator>());
     });
   });
 }
