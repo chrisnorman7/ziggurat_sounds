@@ -63,12 +63,13 @@ void main() {
       expect(() => soundManager.getChannel(channel.id),
           throwsA(isA<NoSuchChannelError>()));
     });
-    test('Sounds', () async {
+    test('Sound', () async {
       final channel = game.createSoundChannel();
       var sound = channel.playSound(SoundReference.file('test.wav'));
       expect(sound.channel, equals(channel.id));
       expect(sound.looping, isFalse);
       expect(sound.keepAlive, isFalse);
+      expect(() => sound.destroy(), throwsA(isA<DeadSound>()));
       await Future<void>.delayed(Duration.zero);
       final channelObject = soundManager.getChannel(channel.id);
       expect(channelObject.sounds[sound.id], isNull);
@@ -77,6 +78,9 @@ void main() {
       expect(sound.keepAlive, isTrue);
       await Future<void>.delayed(Duration.zero);
       expect(channelObject.sounds[sound.id], isA<BufferGenerator>());
+      sound.destroy();
+      await Future<void>.delayed(Duration.zero);
+      expect(channelObject.sounds[sound.id], isNull);
     });
   });
 }
