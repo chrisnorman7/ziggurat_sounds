@@ -13,5 +13,5 @@ class CustomBufferStore extends BufferStore {
       : super(random, synthizer);
 
   @override
-  Buffer getBuffer(String name, SoundType type) => Buffer(synthizer);
+  Buffer getBuffer(SoundReference reference) => Buffer(synthizer);
 }

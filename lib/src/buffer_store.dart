@@ -7,6 +7,7 @@ import 'package:dart_synthizer/dart_synthizer.dart';
 import 'package:ziggurat/ziggurat.dart';
 
 import 'error.dart';
+import 'json/vault_file.dart';
 
 /// A class for storing [Buffer] instances.
 class BufferStore {
@@ -143,20 +144,20 @@ class BufferStore {
   }
 
   /// Get a buffer.
-  Buffer getBuffer(String name, SoundType type) {
-    switch (type) {
+  Buffer getBuffer(SoundReference reference) {
+    switch (reference.type) {
       case SoundType.file:
-        final buffer = _bufferFiles[name];
+        final buffer = _bufferFiles[reference.name];
         if (buffer == null) {
-          throw NoSuchBufferError(name, type: type);
+          throw NoSuchBufferError(reference.name, type: reference.type);
         }
         return buffer;
       case SoundType.collection:
-        final buffers = _bufferCollections[name];
+        final buffers = _bufferCollections[reference.name];
         if (buffers != null) {
           return buffers[random.nextInt(buffers.length)];
         }
-        throw NoSuchBufferError(name, type: type);
+        throw NoSuchBufferError(reference.name, type: reference.type);
     }
   }
 

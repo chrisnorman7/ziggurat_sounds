@@ -88,7 +88,7 @@ class SoundManager {
       final generator = BufferGenerator(context)
         ..looping = event.looping
         ..gain = event.gain
-        ..setBuffer(buffers.getBuffer(event.sound.name, event.sound.type));
+        ..setBuffer(buffers.getBuffer(event.sound));
       if (event.keepAlive == false) {
         generator.configDeleteBehavior(linger: true);
       } else {
