@@ -1,7 +1,6 @@
 /// Provides various error types used by this package.
 import 'package:ziggurat/ziggurat.dart';
 
-import 'audio_channel.dart';
 import 'buffer_store.dart';
 
 /// The base class for all errors in this package.
@@ -62,17 +61,14 @@ class NoSuchReverbError extends ZigguratSoundsError {
   String toString() => 'No such reverb: $id.';
 }
 
-/// No such sound was found on [channel].
+/// No such sound was found.
 class NoSuchSoundError extends ZigguratSoundsError {
   /// Create an instance.
-  NoSuchSoundError(this.id, this.channel);
+  NoSuchSoundError(this.id);
 
   /// The ID of the sound.
   final int id;
 
-  /// The channel the sound was supposedly registered to.
-  final AudioChannel channel;
-
   @override
-  String toString() => 'No such sound found on channel #${channel.id}: $id.';
+  String toString() => 'No sound found with ID $id.';
 }

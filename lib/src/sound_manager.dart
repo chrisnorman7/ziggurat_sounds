@@ -14,12 +14,13 @@ class SoundManager {
   SoundManager(this.context)
       : bufferStores = <BufferStore>[],
         _reverbs = {},
-        _channels = {};
+        _channels = {},
+        _sounds = {};
 
   /// The synthizer context to use.
   final Context context;
 
-  /// The buffer store to use.
+  /// The list of buffer stores to use.
   final List<BufferStore> bufferStores;
 
   /// The reverbs that have been registered.
@@ -27,6 +28,9 @@ class SoundManager {
 
   /// The audio channels that have been registered.
   final Map<int, AudioChannel> _channels;
+
+  /// All the sounds that have been kept alive.
+  final Map<int, BufferGenerator> _sounds;
 
   /// Get a reverb.
   ///
@@ -48,6 +52,18 @@ class SoundManager {
       throw NoSuchChannelError(id);
     }
     return channel;
+  }
+
+  /// Get a sound with the given ID.
+  ///
+  /// If no sound is found with the given [id], [NoSuchSoundError] will be
+  /// thrown.
+  BufferGenerator getSound(int id) {
+    final sound = _sounds[id];
+    if (sound == null) {
+      throw NoSuchSoundError(id);
+    }
+    return sound;
   }
 
   /// Get a buffer from the list of [bufferStores].
@@ -84,6 +100,8 @@ class SoundManager {
         context.ConfigRoute(source, reverb.reverb);
       }
       _channels[event.id] = AudioChannel(event.id, source);
+    } else if (event is SetSoundChannelGain) {
+      getChannel(event.id).source.gain = event.gain;
     } else if (event is DestroySoundChannel) {
       final channel = getChannel(event.id);
       _channels.remove(event.id);
@@ -102,19 +120,37 @@ class SoundManager {
         ..looping = event.looping
         ..gain = event.gain
         ..setBuffer(getBuffer(event.sound));
-      if (event.keepAlive == false) {
-        generator.configDeleteBehavior(linger: true);
-      } else {
+      if (event.keepAlive) {
         channel.sounds[event.id] = generator;
+        _sounds[event.id] = generator;
+      } else {
+        generator.configDeleteBehavior(linger: true);
       }
       channel.source.addGenerator(generator);
     } else if (event is DestroySound) {
-      final channel = getChannel(event.channel);
-      final sound = channel.sounds.remove(event.id);
+      final sound = _sounds.remove(event.id);
       if (sound == null) {
-        throw NoSuchSoundError(event.id, channel);
+        throw NoSuchSoundError(event.id);
+      }
+      for (final channel in _channels.values) {
+        channel.sounds.remove(event.id);
       }
       sound.destroy();
+    } else if (event is PauseSound) {
+      getSound(event.id).pause();
+    } else if (event is UnpauseSound) {
+      getSound(event.id).play();
+    } else if (event is SetLoop) {
+      getSound(event.id).looping = event.looping;
+    } else if (event is SetSoundGain) {
+      getSound(event.id).gain = event.gain;
+    } else if (event is AutomationFade) {
+      getSound(event.id).setAutomation(Properties.gain, [
+        AutomationPoint(event.preFade, event.startGain),
+        AutomationPoint(event.preFade + event.fadeLength, event.endGain)
+      ]);
+    } else if (event is CancelAutomationFade) {
+      getSound(event.id).clearAutomation(Properties.gain);
     } else {
       throw Exception('Cannot handle $event.');
     }
