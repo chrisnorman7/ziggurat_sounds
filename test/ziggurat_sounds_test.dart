@@ -12,10 +12,11 @@ import 'custom_buffer_store.dart';
 
 void main() {
   final synthizer = Synthizer()..initialize();
+  tearDownAll(synthizer.shutdown);
   final context = synthizer.createContext();
   final buffers = CustomBufferStore(Random(), synthizer);
   final game = Game('Sounds');
-  final soundManager = SoundManager(context, buffers);
+  final soundManager = SoundManager(context)..bufferStores.add(buffers);
   game.sounds.listen(soundManager.handleEvent);
   group('Initialisation', () {
     test('Ensure initialisation', () async {

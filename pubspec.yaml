@@ -1,11 +1,10 @@
 name: ziggurat_sounds
 description: Provide sound support for [Ziggurat](https://github.com/chrisnorman7/ziggurat).
 version: 0.0.0
-publish_to: none
-# homepage: https://github.com/chrisnorman7/ziggurat_sounds
+repository: https://github.com/chrisnorman7/ziggurat_sounds
 
 environment:
-  sdk: ">=2.14.0-377.7.beta <3.0.0"
+  sdk: ">=2.13.0 <3.0.0"
 
 dependencies:
   dart_synthizer: ^0.0.3

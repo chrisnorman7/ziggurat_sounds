@@ -11,15 +11,16 @@ import 'reverb.dart';
 /// The sound manager class.
 class SoundManager {
   /// Create a sound manager.
-  SoundManager(this.context, this.buffers)
-      : _reverbs = {},
+  SoundManager(this.context)
+      : bufferStores = <BufferStore>[],
+        _reverbs = {},
         _channels = {};
 
   /// The synthizer context to use.
   final Context context;
 
   /// The buffer store to use.
-  final BufferStore buffers;
+  final List<BufferStore> bufferStores;
 
   /// The reverbs that have been registered.
   final Map<int, Reverb> _reverbs;
@@ -47,6 +48,18 @@ class SoundManager {
       throw NoSuchChannelError(id);
     }
     return channel;
+  }
+
+  /// Get a buffer from the list of [bufferStores].
+  Buffer getBuffer(SoundReference reference) {
+    for (final bufferStore in bufferStores) {
+      try {
+        return bufferStore.getBuffer(reference);
+      } on NoSuchBufferError {
+        continue;
+      }
+    }
+    throw NoSuchBufferError(reference.name, type: reference.type);
   }
 
   /// Handle a sound event.
@@ -88,7 +101,7 @@ class SoundManager {
       final generator = BufferGenerator(context)
         ..looping = event.looping
         ..gain = event.gain
-        ..setBuffer(buffers.getBuffer(event.sound));
+        ..setBuffer(getBuffer(event.sound));
       if (event.keepAlive == false) {
         generator.configDeleteBehavior(linger: true);
       } else {
