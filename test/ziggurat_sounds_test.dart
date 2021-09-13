@@ -114,8 +114,27 @@ void main() {
       sound = channel.playSound(SoundReference.file('another.wav'),
           keepAlive: true);
       expect(sound.keepAlive, isTrue);
-      await Future<void>.delayed(Duration.zero);
-      expect(channelObject.sounds[sound.id], isA<BufferGenerator>());
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      final generator = channelObject.sounds[sound.id];
+      expect(generator, isA<BufferGenerator>());
+      if (generator != null) {
+        // We know it is, but now Dart does too.
+        expect(generator.gain, equals(sound.gain));
+        sound.looping = true;
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        expect(generator.looping, isTrue);
+        sound.looping = false;
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        expect(generator.looping, isFalse);
+        sound.gain = 1.5;
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        expect(generator.gain, equals(1.5));
+        sound.gain = 1.0;
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        expect(generator.gain, equals(1.0));
+      } else {
+        throw Exception('The world has gone mad.');
+      }
       sound.destroy();
       await Future<void>.delayed(Duration.zero);
       expect(channelObject.sounds[sound.id], isNull);
