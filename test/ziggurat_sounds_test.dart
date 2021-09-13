@@ -132,6 +132,14 @@ void main() {
         sound.gain = 1.0;
         await Future<void>.delayed(Duration(milliseconds: 200));
         expect(generator.gain, equals(1.0));
+        final fade = sound.fade(length: 1.0, startGain: 1.0);
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        expect(generator.gain, lessThan(1.0));
+        fade.cancel();
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        final gain = generator.gain;
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        expect(generator.gain, equals(gain));
       } else {
         throw Exception('The world has gone mad.');
       }
