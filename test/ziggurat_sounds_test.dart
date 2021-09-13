@@ -53,15 +53,52 @@ void main() {
           throwsA(isA<NoSuchReverbError>()));
     });
     test('Channel', () async {
-      final channel = game.createSoundChannel();
+      var channelEvent = game.createSoundChannel();
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      var channel = soundManager.getChannel(channelEvent.id);
+      expect(channel.id, equals(channelEvent.id));
+      expect(channel.sounds, isEmpty);
+      var source = channel.source;
+      expect(source, isA<DirectSource>());
+      expect(source.gain, equals(0.70));
+      channelEvent.gain *= 2;
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(source.gain, equals(1.4));
+      channelEvent = game.createSoundChannel(position: SoundPositionPanned());
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      channel = soundManager.getChannel(channelEvent.id);
+      source = channel.source;
+      if (source is PannedSource) {
+        expect(source.elevation, isZero);
+        expect(source.panningScalar, isZero);
+        channelEvent.position =
+            SoundPositionPanned(elevation: 1.0, scalar: -1.0);
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        expect(source.panningScalar, equals(-1.0));
+        expect(source.elevation, equals(1.0));
+        expect(source.gain, equals(channelEvent.gain));
+      } else {
+        throw Exception('Source is not `PannedSource`.');
+      }
+      channelEvent = game.createSoundChannel(position: SoundPosition3d());
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      channel = soundManager.getChannel(channelEvent.id);
+      source = channel.source;
+      if (source is Source3D) {
+        final position = source.position;
+        expect(position.x, isZero);
+        expect(position.y, isZero);
+        expect(position.z, isZero);
+        channelEvent.position = SoundPosition3d(x: 1.0, y: 2.0, z: 3.0);
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        expect(source.position, equals(Double3(1.0, 2.0, 3.0)));
+        expect(source.gain, equals(channelEvent.gain));
+      } else {
+        throw Exception('Source is not of type `Source3D`.');
+      }
+      channelEvent.destroy();
       await Future<void>.delayed(Duration.zero);
-      expect(
-          soundManager.getChannel(channel.id),
-          predicate(
-              (value) => value is AudioChannel && value.id == channel.id));
-      channel.destroy();
-      await Future<void>.delayed(Duration.zero);
-      expect(() => soundManager.getChannel(channel.id),
+      expect(() => soundManager.getChannel(channelEvent.id),
           throwsA(isA<NoSuchChannelError>()));
     });
     test('Sound', () async {

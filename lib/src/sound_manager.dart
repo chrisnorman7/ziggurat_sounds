@@ -102,6 +102,19 @@ class SoundManager {
       _channels[event.id] = AudioChannel(event.id, source);
     } else if (event is SetSoundChannelGain) {
       getChannel(event.id).source.gain = event.gain;
+    } else if (event is SetSoundChannelPosition) {
+      final channel = getChannel(event.id);
+      final position = event.position;
+      if (position is SoundPosition3d) {
+        (channel.source as Source3D).position =
+            Double3(position.x, position.y, position.z);
+      } else if (position is SoundPositionPanned) {
+        channel.source as PannedSource
+          ..elevation = position.elevation
+          ..panningScalar = position.scalar;
+      } else {
+        // Nothing to do.
+      }
     } else if (event is DestroySoundChannel) {
       final channel = getChannel(event.id);
       _channels.remove(event.id);

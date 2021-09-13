@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.3]
+
+### Added
+
+* Implemented the `SetSoundChannelPosition` event.
+
+## [0.1.2]
+
+### Added
+
 ## [0.1.1]
 
 ### Changed

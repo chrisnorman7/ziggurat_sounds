@@ -10,7 +10,7 @@ class AudioChannel {
   final int id;
 
   /// The audio source to use.
-  final Source source;
+  Source source;
 
   /// The sounds that are playing through this channel.
   final Map<int, BufferGenerator> sounds;
