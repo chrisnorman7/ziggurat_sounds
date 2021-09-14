@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:dart_synthizer/dart_synthizer.dart';
-import 'package:test/expect.dart';
-import 'package:test/scaffolding.dart';
+import 'package:test/test.dart';
 import 'package:ziggurat/ziggurat.dart';
 import 'package:ziggurat_sounds/src/sound_manager.dart';
 import 'package:ziggurat_sounds/ziggurat_sounds.dart';
@@ -154,6 +155,128 @@ void main() {
           channelObject.sounds[sound.id],
           predicate(
               (value) => value is BufferGenerator && value.looping == true));
+    });
+  });
+  group('SoundManager', () {
+    final soundManager = SoundManager(context);
+    final bufferStore = BufferStore(Random(), synthizer);
+    test('.bufferStores', () {
+      expect(soundManager.bufferStores, isEmpty);
+      soundManager.bufferStores.add(bufferStore);
+      expect(soundManager.bufferStores.length, equals(1));
+      soundManager.bufferStores.clear();
+      expect(soundManager.bufferStores, isEmpty);
+    });
+    test('.getBuffer', () async {
+      expect(() => soundManager.getBuffer(SoundReference.file('silence.wav')),
+          throwsA(isA<NoSuchBufferError>()));
+      await bufferStore.addFile(File('silence.wav'));
+      soundManager.bufferStores.add(bufferStore);
+      expect(soundManager.getBuffer(SoundReference.file('silence.wav')),
+          isA<Buffer>());
+    });
+    test('.getChannel', () {
+      expect(
+          () => soundManager.getChannel(1), throwsA(isA<NoSuchChannelError>()));
+      soundManager.handleEvent(SoundChannel(game: game, id: 1));
+      final channel = soundManager.getChannel(1);
+      expect(channel, isA<AudioChannel>());
+      expect(channel.id, equals(1));
+      expect(channel.source, isA<DirectSource>());
+      expect(channel.sounds, isEmpty);
+    });
+    test('.getReverb', () {
+      expect(
+          () => soundManager.getReverb(2), throwsA(isA<NoSuchReverbError>()));
+      soundManager.handleEvent(
+          CreateReverb(game: game, id: 2, reverb: ReverbPreset('Test Reverb')));
+      final reverb = soundManager.getReverb(2);
+      expect(reverb, isA<Reverb>());
+      expect(reverb.name, equals('Test Reverb'));
+      expect(reverb.reverb, isA<GlobalFdnReverb>());
+    });
+    test('.getSound', () {
+      expect(() => soundManager.getSound(3), throwsA(isA<NoSuchSoundError>()));
+      expect(bufferStore.getBuffer(SoundReference.file('silence.wav')),
+          isA<Buffer>());
+      soundManager.bufferStores.add(bufferStore);
+      final soundEvent = PlaySound(
+          game: game,
+          sound: SoundReference.file('silence.wav'),
+          channel: game.interfaceSounds.id,
+          keepAlive: true);
+      soundManager.handleEvent(soundEvent);
+      final sound = soundManager.getSound(soundEvent.id);
+      expect(sound, isA<BufferGenerator>());
+    });
+  });
+  group('BufferStore', () {
+    final bufferStore = BufferStore(Random(), synthizer);
+    setUp(() => bufferStore.clear(includeProtected: true));
+    test('Initialisation', () {
+      expect(bufferStore.bufferCollections, isEmpty);
+      expect(bufferStore.bufferFiles, isEmpty);
+    });
+    test('addFile', () async {
+      await bufferStore.addFile(File('silence.wav'));
+      expect(bufferStore.bufferFiles.length, equals(1));
+      expect(bufferStore.bufferFiles.first, equals('silence.wav'));
+      expect(bufferStore.bufferCollections, isEmpty);
+    });
+    test('addDirectory', () async {
+      await bufferStore.addDirectory(Directory('silences'));
+      expect(bufferStore.bufferCollections.length, equals(1));
+      expect(bufferStore.bufferCollections.first, equals('silences'));
+      expect(bufferStore.bufferFiles, isEmpty);
+    });
+    test('removeBufferFile', () async {
+      await bufferStore.addFile(File('silence.wav'));
+      bufferStore.removeBufferFile('silence.wav');
+      expect(bufferStore.bufferFiles, isEmpty);
+      expect(bufferStore.bufferCollections, isEmpty);
+    });
+    test('removeBufferCollection', () async {
+      await bufferStore.addDirectory(Directory('silences'));
+      bufferStore.removeBufferCollection('silences');
+      expect(bufferStore.bufferCollections, isEmpty);
+      expect(bufferStore.bufferFiles, isEmpty);
+    });
+    test('clear', () async {
+      await bufferStore.addDirectory(Directory('silences'));
+      await bufferStore.addFile(File('silence.wav'));
+      bufferStore.clear();
+      expect(bufferStore.bufferCollections, isEmpty);
+      expect(bufferStore.bufferFiles, isEmpty);
+      await bufferStore.addDirectory(Directory('silences'), protected: true);
+      await bufferStore.addFile(File('silence.wav'), protected: true);
+      bufferStore.clear();
+      expect(bufferStore.bufferCollections.length, equals(1));
+      expect(bufferStore.bufferFiles.length, equals(1));
+      bufferStore.clear(includeProtected: true);
+      expect(bufferStore.bufferCollections, isEmpty);
+      expect(bufferStore.bufferFiles, isEmpty);
+    });
+    test('addVaultFile', () {
+      final silence = base64Encode(File('silence.wav').readAsBytesSync());
+      final vaultFile = VaultFile(files: {
+        'silence.wav': silence
+      }, folders: {
+        'silence': [silence]
+      });
+      bufferStore.addVaultFile(vaultFile);
+      expect(bufferStore.bufferCollections.length, equals(1));
+      expect(bufferStore.bufferFiles.length, equals(1));
+      bufferStore
+        ..clear()
+        ..addVaultFile(vaultFile, protected: true);
+      expect(bufferStore.bufferCollections.length, equals(1));
+      expect(bufferStore.bufferFiles.length, equals(1));
+      bufferStore.clear();
+      expect(bufferStore.bufferCollections.length, equals(1));
+      expect(bufferStore.bufferFiles.length, equals(1));
+      bufferStore.clear(includeProtected: true);
+      expect(bufferStore.bufferCollections, isEmpty);
+      expect(bufferStore.bufferFiles, isEmpty);
     });
   });
 }

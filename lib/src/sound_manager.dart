@@ -9,6 +9,15 @@ import 'extensions.dart';
 import 'reverb.dart';
 
 /// The sound manager class.
+///
+/// Instances of this class handle [SoundEvent] instances via the [handleEvent]
+/// method.
+///
+/// Once you have a [Game] instance, you can hook up an instance to listen for
+/// events:
+///
+/// ```game.sounds.listen(soundManager.handleEvent);
+/// ```
 class SoundManager {
   /// Create a sound manager.
   SoundManager(this.context)
@@ -21,15 +30,24 @@ class SoundManager {
   final Context context;
 
   /// The list of buffer stores to use.
+  ///
+  /// You can add and remove buffer stores from this list, but if the list is
+  /// empty, the [getBuffer] method will always fail.
   final List<BufferStore> bufferStores;
 
   /// The reverbs that have been registered.
+  ///
+  /// You should get reverbs with the [getReverb] method.
   final Map<int, Reverb> _reverbs;
 
   /// The audio channels that have been registered.
+  ///
+  /// You should get channels with the [getChannel] method.
   final Map<int, AudioChannel> _channels;
 
   /// All the sounds that have been kept alive.
+  ///
+  /// You should get sounds with the [getSound] method.
   final Map<int, BufferGenerator> _sounds;
 
   /// Get a reverb.
@@ -67,6 +85,12 @@ class SoundManager {
   }
 
   /// Get a buffer from the list of [bufferStores].
+  ///
+  /// This method iterates over the `bufferStores` list, and returns the first
+  /// appropriate buffer.
+  ///
+  /// If no buffer is found with the given [reference], [NoSuchBufferError] is
+  /// thrown.
   Buffer getBuffer(SoundReference reference) {
     for (final bufferStore in bufferStores) {
       try {
@@ -79,6 +103,9 @@ class SoundManager {
   }
 
   /// Handle a sound event.
+  ///
+  /// This method should be used to listen for events from the [Game.sounds]
+  /// stream.
   void handleEvent(SoundEvent event) {
     if (event is SoundChannel) {
       final position = event.position;

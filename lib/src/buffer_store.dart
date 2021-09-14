@@ -8,8 +8,16 @@ import 'package:ziggurat/ziggurat.dart';
 
 import 'error.dart';
 import 'json/vault_file.dart';
+import 'sound_manager.dart';
 
 /// A class for storing [Buffer] instances.
+///
+/// Instances of this class should be added to the
+/// [SoundManager.bufferStores] list.
+///
+/// If you are using the [ziggurat_utils](https://pub.dev/packages/ziggurat_utils)
+/// package, you can use the `vault` script to create subclasses with files
+/// ready to go.
 class BufferStore {
   /// Create an instance.
   BufferStore(this.random, this.synthizer)
@@ -19,9 +27,13 @@ class BufferStore {
         _protectedBufferCollections = [];
 
   /// The random number generator to be used by [getBuffer].
+  ///
+  /// This value is used when picking a random sound from a buffer collection.
   final Random random;
 
   /// The synthizer instance to use.
+  ///
+  ///This value is used to create [Buffer] instances.
   final Synthizer synthizer;
 
   /// The single buffer entries.
@@ -104,6 +116,8 @@ class BufferStore {
   }
 
   /// Remove a buffer file.
+  ///
+  /// This method does not care if [name] is protected.
   void removeBufferFile(String name) {
     final buffer = _bufferFiles.remove(name);
     if (buffer != null) {
@@ -115,6 +129,8 @@ class BufferStore {
   }
 
   /// Remove a buffer collection.
+  ///
+  /// This method does not care if [name] is protected.
   void removeBufferCollection(String name) {
     final buffers = _bufferCollections.remove(name);
     if (buffers != null) {
@@ -128,43 +144,55 @@ class BufferStore {
   }
 
   /// Clear buffers from this instance.
+  ///
+  /// If [includeProtected] is `true`, then all buffers will be cleared.
+  ///
+  /// Otherwise, those buffers that are protected will be skipped.
   void clear({bool includeProtected = false}) {
     for (final name in _bufferFiles.keys.toList()) {
-      if (_protectedBufferFiles.contains(name) == false ||
-          includeProtected == true) {
+      if (includeProtected == true ||
+          _protectedBufferFiles.contains(name) == false) {
         removeBufferFile(name);
       }
     }
     for (final name in _bufferCollections.keys.toList()) {
-      if (_protectedBufferCollections.contains(name) == false ||
-          includeProtected == true) {
+      if (includeProtected == true ||
+          _protectedBufferCollections.contains(name) == false) {
         removeBufferCollection(name);
       }
     }
   }
 
   /// Get a buffer.
+  ///
+  /// If the resulting buffer is a file, then that exact buffer will be
+  /// returned. Otherwise, a random buffer from the collection will be
+  /// returned.
+  ///
+  /// If no buffer is found by the given [reference], [NoSuchBufferError] will
+  /// be thrown.
   Buffer getBuffer(SoundReference reference) {
     switch (reference.type) {
       case SoundType.file:
         final buffer = _bufferFiles[reference.name];
-        if (buffer == null) {
-          throw NoSuchBufferError(reference.name, type: reference.type);
+        if (buffer != null) {
+          return buffer;
         }
-        return buffer;
+        break;
       case SoundType.collection:
         final buffers = _bufferCollections[reference.name];
         if (buffers != null) {
           return buffers[random.nextInt(buffers.length)];
         }
-        throw NoSuchBufferError(reference.name, type: reference.type);
+        break;
     }
+    throw NoSuchBufferError(reference.name, type: reference.type);
   }
 
   /// Get a sound reference you can use with various objects in the library.
   ///
   /// This method will run through all files and collections to find a
-  /// reference.
+  /// valid reference.
   ///
   /// If nothing is found, [NoSuchBufferError] will be thrown.
   SoundReference getSoundReference(String name) {

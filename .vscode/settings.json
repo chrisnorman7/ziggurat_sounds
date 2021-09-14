@@ -3,12 +3,17 @@
     "abbr",
     "analyzer",
     "Behavior",
+    "ctx",
     "encrypter",
     "Fdn",
     "formals",
     "Lf",
     "Rolloff",
+    "sdl",
     "synthizer",
     "writeln"
-  ]
+  ],
+  "accessibleCodeRuler.languageMaximumLineLength": {
+    "dart": 80
+  }
 }
