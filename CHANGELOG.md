@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.0]
+
+### Removed
+
+* Removed the massive amount of sound files I didn't realise i was shipping.
+
 ## [0.1.3]
 
 ### Added
