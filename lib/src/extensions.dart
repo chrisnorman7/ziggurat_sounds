@@ -5,7 +5,6 @@ import 'package:ziggurat/ziggurat.dart';
 /// An extension for creating a [GlobalFdnReverb] instance from a
 /// [ReverbPreset] instance.
 extension MakeGlobalFdnReverb on ReverbPreset {
-  /// Get a global FDN reverb instance from this instance.
   /// Make a reverb object from this preset.
   GlobalFdnReverb makeReverb(Context context) {
     final r = GlobalFdnReverb(context)

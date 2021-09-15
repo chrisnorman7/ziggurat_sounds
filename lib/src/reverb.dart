@@ -1,5 +1,6 @@
 /// Provides the [Reverb] class.
 import 'package:dart_synthizer/dart_synthizer.dart';
+import 'package:ziggurat/ziggurat.dart';
 
 /// A reverb object.
 class Reverb {
@@ -10,5 +11,7 @@ class Reverb {
   final String name;
 
   /// The reverb instance.
+  ///
+  /// This value is usually made from a [ReverbPreset] instance.
   final GlobalFdnReverb reverb;
 }

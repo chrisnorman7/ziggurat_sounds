@@ -32,6 +32,8 @@ class DataFileEntry {
 }
 
 /// A class which holds a list of [DataFileEntry] instances.
+///
+/// Instances of this class are used by the `data2json` script in the [ziggurat_utils](https://pub.dev/packages/ziggurat_utils) package.
 @JsonSerializable()
 class DataFile with DumpLoadMixin {
   /// Create an instance.
@@ -50,6 +52,9 @@ class DataFile with DumpLoadMixin {
   final List<DataFileEntry> entries;
 
   /// The leading comment for the resulting dart file.
+  ///
+  /// This value will appear at the top of the dart file that `data2json`
+  /// generates.
   final String? comment;
 
   /// Convert an instance to JSON.

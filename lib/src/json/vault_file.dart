@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:encrypt/encrypt.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../buffer_store.dart';
 import 'common.dart';
 import 'data_file.dart';
 
@@ -20,9 +21,23 @@ typedef FoldersType = Map<String, List<String>>;
 typedef VaultFileStubEntriesType = List<DataFileEntry>;
 
 /// A collection of files and folders stored as strings.
+///
+/// Instances of this class can be more easily created by the `vault` script
+/// from the [ziggurat_utils](https://pub.dev/packages/ziggurat_utils) package.
+///
+/// Instances of this class are used to encrypt and thus obfuscate game assets.
+///
+/// They are primarily used by the [BufferStore.addVaultFile] method, but there
+/// is no limitation on the types of file they can store.
 @JsonSerializable()
 class VaultFile {
   /// Create an instance.
+  ///
+  /// If you have a [File] object, you can load it more easily with the
+  /// [fromFile] static method or the [VaultFile.fromFileSync] constructor.
+  ///
+  /// If you have an encrypted string (loaded from the network for example), you
+  /// can load it with the [VaultFile.fromEncryptedString] constructor.
   VaultFile({FilesType? files, FoldersType? folders})
       : files = files ?? {},
         folders = folders ?? {};
@@ -48,6 +63,9 @@ class VaultFile {
           contents: file.readAsStringSync(), encryptionKey: encryptionKey);
 
   /// Return an instance loaded from [file].
+  ///
+  /// This method reads the file in chunks, then creates the [VaultFile]
+  /// instance.
   static Future<VaultFile> fromFile(File file, String encryptionKey) async {
     final buffer = StringBuffer();
     final reader = file.openRead();
@@ -59,9 +77,14 @@ class VaultFile {
   }
 
   /// A map of filenames to contents.
+  ///
+  /// The `contents` in question is the result of reading a file as bytes, then
+  /// base64 encoding that array.
   final FilesType files;
 
   /// A map of folder names to lists of file contents.
+  ///
+  /// See the docs of the [files] map to see what `contents` means in this case.
   final FoldersType folders;
 
   /// Convert an instance to JSON.
@@ -78,6 +101,8 @@ class VaultFile {
   }
 
   /// Write an encrypted version of this file to disk.
+  ///
+  /// This method uses the [toEncryptedString] method to write the [file].
   void write(File file, String encryptionKey) =>
       file.writeAsStringSync(toEncryptedString(encryptionKey: encryptionKey));
 }
@@ -86,6 +111,9 @@ class VaultFile {
 ///
 /// We use [DataFileEntry] instances because they already provide all the
 /// metadata we need.
+///
+/// This class is used by the `vault` script from the
+/// [ziggurat_utils](https://pub.dev/packages/ziggurat_utils) package.
 @JsonSerializable()
 class VaultFileStub with DumpLoadMixin {
   /// Create an instance.
