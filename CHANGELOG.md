@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.1]
+
+### Added
+
+* Added more complete test coverage.
+
+### Changed
+
+* Updated the documentation.
+
 ## [0.2.0]
 
 ### Removed
