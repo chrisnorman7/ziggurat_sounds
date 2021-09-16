@@ -114,9 +114,17 @@ class SoundManager {
         source = Source3D(context)
           ..position = Double3(position.x, position.y, position.z);
       } else if (position is SoundPositionPanned) {
-        source = PannedSource(context)
-          ..elevation = position.elevation
-          ..panningScalar = position.scalar;
+        final s = PannedSource(context);
+        final azimuth = position.azimuthOrScalar;
+        final elevation = position.elevation;
+        if (elevation == null) {
+          s.panningScalar = azimuth;
+        } else {
+          s
+            ..azimuth = azimuth
+            ..elevation = elevation;
+        }
+        source = s;
       } else {
         source = DirectSource(context);
       }
@@ -136,9 +144,16 @@ class SoundManager {
         (channel.source as Source3D).position =
             Double3(position.x, position.y, position.z);
       } else if (position is SoundPositionPanned) {
-        channel.source as PannedSource
-          ..elevation = position.elevation
-          ..panningScalar = position.scalar;
+        final azimuth = position.azimuthOrScalar;
+        final elevation = position.elevation;
+        final s = channel.source as PannedSource;
+        if (elevation == null) {
+          s.panningScalar = azimuth;
+        } else {
+          s
+            ..azimuth = azimuth
+            ..elevation = elevation;
+        }
       } else {
         // Nothing to do.
       }

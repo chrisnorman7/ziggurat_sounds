@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.3]
+
+### Changed
+
+* Handle the new way `SoundPositionPanned` works.
+
 ## [0.2.2]
 
 ### Added

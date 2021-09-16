@@ -85,11 +85,14 @@ void main() {
       if (source is PannedSource) {
         expect(source.elevation, isZero);
         expect(source.panningScalar, isZero);
-        channelEvent.position =
-            SoundPositionPanned(elevation: 1.0, scalar: -1.0);
+        channelEvent.position = SoundPositionPanned(azimuthOrScalar: -1.0);
         await Future<void>.delayed(Duration(milliseconds: 200));
         expect(source.panningScalar, equals(-1.0));
-        expect(source.elevation, equals(1.0));
+        channelEvent.position =
+            SoundPositionPanned(azimuthOrScalar: 90.0, elevation: 45.0);
+        await Future<void>.delayed(Duration(milliseconds: 200));
+        expect(source.azimuth, equals(90.0));
+        expect(source.elevation, equals(45.0));
         expect(source.gain, equals(channelEvent.gain));
       } else {
         throw Exception('Source is not `PannedSource`.');
