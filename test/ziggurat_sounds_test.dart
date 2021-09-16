@@ -170,6 +170,7 @@ void main() {
       await Future<void>.delayed(Duration(milliseconds: 200));
       final generator = channelObject.sounds[sound.id];
       expect(generator, isA<BufferGenerator>());
+      expect(soundManager.getSound(sound.id), isA<BufferGenerator>());
       if (generator != null) {
         // We know it is, but now Dart does too.
         expect(generator.gain, equals(sound.gain));
