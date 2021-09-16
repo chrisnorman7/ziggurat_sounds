@@ -10,6 +10,7 @@ import 'package:ziggurat_sounds/src/sound_manager.dart';
 import 'package:ziggurat_sounds/ziggurat_sounds.dart';
 
 import 'custom_buffer_store.dart';
+import 'custom_sound_manager.dart';
 
 void main() {
   final synthizer = Synthizer()..initialize();
@@ -17,7 +18,7 @@ void main() {
   final context = synthizer.createContext();
   final buffers = CustomBufferStore(Random(), synthizer);
   final game = Game('Sounds');
-  final soundManager = SoundManager(context)..bufferStores.add(buffers);
+  final soundManager = CustomSoundManager(context)..bufferStores.add(buffers);
   game.sounds.listen(soundManager.handleEvent);
   group('Initialisation', () {
     test('Ensure initialisation', () async {
@@ -31,6 +32,9 @@ void main() {
     });
     test('Game Initialisation', () async {
       expect(game.soundsController.hasListener, isTrue);
+      expect(soundManager.events.length, equals(2));
+      expect(soundManager.events.first, equals(game.interfaceSounds));
+      expect(soundManager.events.last, equals(game.ambianceSounds));
       expect(soundManager.getChannel(1), isA<AudioChannel>());
       expect(soundManager.getChannel(2), isA<AudioChannel>());
       expect(
@@ -42,6 +46,8 @@ void main() {
       final preset = ReverbPreset('Test Reverb');
       final reverb = game.createReverb(preset);
       await Future<void>.delayed(Duration.zero);
+      expect(soundManager.events.length, equals(3));
+      expect(soundManager.events.last, equals(reverb));
       expect(
           soundManager.getReverb(SoundEvent.maxEventId),
           predicate((value) =>
@@ -52,11 +58,18 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       expect(() => soundManager.getReverb(reverb.id),
           throwsA(isA<NoSuchReverbError>()));
+      expect(soundManager.events.length, equals(4));
+      expect(
+          soundManager.events.last,
+          predicate(
+              (value) => value is DestroyReverb && value.id == reverb.id));
     });
     test('Channel', () async {
+      var length = soundManager.events.length;
       var channelEvent = game.createSoundChannel();
       await Future<void>.delayed(Duration(milliseconds: 200));
       var channel = soundManager.getChannel(channelEvent.id);
+      expect(soundManager.events.length, equals(length + 1));
       expect(channel.id, equals(channelEvent.id));
       expect(channel.sounds, isEmpty);
       var source = channel.source;
@@ -81,6 +94,45 @@ void main() {
       } else {
         throw Exception('Source is not `PannedSource`.');
       }
+      // There is no real way to test these filters work, since the `filter`
+      // property is read-only in Synthizer land.
+      //
+      // The best we can do is to make sure there are no crashes when we set
+      // filters
+      length = soundManager.events.length;
+      channelEvent.filterBandpass(440.0, 200.0);
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(soundManager.events.length, equals(++length));
+      var event = soundManager.events.last;
+      expect(event, isA<SoundChannelBandpass>());
+      expect((event as SoundChannelBandpass).frequency, equals(440.0));
+      expect(event.bandwidth, equals(200.0));
+      expect(event.id, equals(channel.id));
+      channelEvent.filterHighpass(
+        440.0,
+      );
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(soundManager.events.length, equals(++length));
+      event = soundManager.events.last;
+      expect(event, isA<SoundChannelHighpass>());
+      expect(event.id, equals(channel.id));
+      expect((event as SoundChannelHighpass).frequency, equals(440.0));
+      channelEvent.filterLowpass(440.0);
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(soundManager.events.length, equals(++length));
+      event = soundManager.events.last;
+      expect(event, isA<SoundChannelLowpass>());
+      expect(event.id, equals(channel.id));
+      expect((event as SoundChannelLowpass).frequency, equals(440.0));
+      channelEvent.clearFilter();
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(soundManager.events.length, equals(++length));
+      event = soundManager.events.last;
+      expect(event, isA<SoundChannelFilter>());
+      expect(event.id, equals(channel.id));
+      expect(event, isNot(isA<SoundChannelHighpass>()));
+      expect(event, isNot(isA<SoundChannelLowpass>()));
+      expect(event, isNot(isA<SoundChannelBandpass>()));
       channelEvent = game.createSoundChannel(position: SoundPosition3d());
       await Future<void>.delayed(Duration(milliseconds: 200));
       channel = soundManager.getChannel(channelEvent.id);
