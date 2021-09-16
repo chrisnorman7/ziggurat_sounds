@@ -11,9 +11,11 @@
     "Highpass",
     "Lf",
     "Lowpass",
+    "math",
     "Rolloff",
     "sdl",
     "synthizer",
+    "var",
     "writeln"
   ],
   "accessibleCodeRuler.languageMaximumLineLength": {
