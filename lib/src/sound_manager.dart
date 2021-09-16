@@ -184,6 +184,22 @@ class SoundManager {
       getSound(event.id).looping = event.looping;
     } else if (event is SetSoundGain) {
       getSound(event.id).gain = event.gain;
+    } else if (event is SetSoundPitchBend) {
+      getSound(event.id)..pitchBend = event.pitchBend;
+    } else if (event is SoundChannelHighpass) {
+      getChannel(event.id).source.filter = BiquadConfig.designHighpass(
+          context.synthizer, event.frequency,
+          q: event.q);
+    } else if (event is SoundChannelLowpass) {
+      getChannel(event.id).source.filter = BiquadConfig.designLowpass(
+          context.synthizer, event.frequency,
+          q: event.q);
+    } else if (event is SoundChannelBandpass) {
+      getChannel(event.id).source.filter = BiquadConfig.designBandpass(
+          context.synthizer, event.frequency, event.bandwidth);
+    } else if (event is SoundChannelFilter) {
+      getChannel(event.id).source.filter =
+          BiquadConfig.designIdentity(context.synthizer);
     } else if (event is AutomationFade) {
       getSound(event.id).setAutomation(Properties.gain, [
         AutomationPoint(event.preFade, event.startGain),

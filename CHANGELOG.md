@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.2]
+
+### Added
+
+* Support the `SetSoundPitchBend` event.
+* Support the `SoundChannelHighpass` event.
+* Support the `SoundChannelLowpass` event.
+* Support the `SoundChannelBandpass` event.
+* Support the `SoundChannelFilter` event.
+
 ## [0.2.1]
 
 ### Added
