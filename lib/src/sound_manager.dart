@@ -113,18 +113,12 @@ class SoundManager {
       if (position is SoundPosition3d) {
         source = Source3D(context)
           ..position = Double3(position.x, position.y, position.z);
-      } else if (position is SoundPositionPanned) {
-        final s = PannedSource(context);
-        final azimuth = position.azimuthOrScalar;
-        final elevation = position.elevation;
-        if (elevation == null) {
-          s.panningScalar = azimuth;
-        } else {
-          s
-            ..azimuth = azimuth
-            ..elevation = elevation;
-        }
-        source = s;
+      } else if (position is SoundPositionScalar) {
+        source =
+            context.createScalarPannedSource(panningScalar: position.scalar);
+      } else if (position is SoundPositionAngular) {
+        source = context.createAngularPannedSource(
+            azimuth: position.azimuth, elevation: position.elevation);
       } else {
         source = DirectSource(context);
       }
@@ -143,17 +137,12 @@ class SoundManager {
       if (position is SoundPosition3d) {
         (channel.source as Source3D).position =
             Double3(position.x, position.y, position.z);
-      } else if (position is SoundPositionPanned) {
-        final azimuth = position.azimuthOrScalar;
-        final elevation = position.elevation;
-        final s = channel.source as PannedSource;
-        if (elevation == null) {
-          s.panningScalar = azimuth;
-        } else {
-          s
-            ..azimuth = azimuth
-            ..elevation = elevation;
-        }
+      } else if (position is SoundPositionScalar) {
+        (channel.source as ScalarPannedSource).panningScalar = position.scalar;
+      } else if (position is SoundPositionAngular) {
+        (channel.source as AngularPannedSource)
+          ..azimuth = position.azimuth
+          ..elevation = position.elevation;
       } else {
         // Nothing to do.
       }

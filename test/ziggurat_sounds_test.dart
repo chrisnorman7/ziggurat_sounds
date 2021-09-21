@@ -78,24 +78,34 @@ void main() {
       channelEvent.gain *= 2;
       await Future<void>.delayed(Duration(milliseconds: 200));
       expect(source.gain, equals(1.4));
-      channelEvent = game.createSoundChannel(position: SoundPositionPanned());
+      channelEvent = game.createSoundChannel(position: SoundPositionScalar());
       await Future<void>.delayed(Duration(milliseconds: 200));
       channel = soundManager.getChannel(channelEvent.id);
       source = channel.source;
-      if (source is PannedSource) {
-        expect(source.elevation, isZero);
+      if (source is ScalarPannedSource) {
         expect(source.panningScalar, isZero);
-        channelEvent.position = SoundPositionPanned(azimuthOrScalar: -1.0);
+        channelEvent.position = SoundPositionScalar(scalar: -1.0);
         await Future<void>.delayed(Duration(milliseconds: 200));
         expect(source.panningScalar, equals(-1.0));
+      } else {
+        throw Exception('Source is not `ScalarPannedSource`.');
+      }
+      channelEvent = game.createSoundChannel(position: SoundPositionAngular());
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      channel = soundManager.getChannel(channelEvent.id);
+      source = channel.source;
+      if (source is AngularPannedSource) {
+        expect(source.azimuth, isZero);
+        expect(source.elevation, isZero);
+        expect(source.gain, equals(channelEvent.gain));
         channelEvent.position =
-            SoundPositionPanned(azimuthOrScalar: 90.0, elevation: 45.0);
+            SoundPositionAngular(azimuth: 90.0, elevation: 45.0);
         await Future<void>.delayed(Duration(milliseconds: 200));
         expect(source.azimuth, equals(90.0));
         expect(source.elevation, equals(45.0));
         expect(source.gain, equals(channelEvent.gain));
       } else {
-        throw Exception('Source is not `PannedSource`.');
+        throw Exception('Source is not `AngularPannedSource`.');
       }
       // There is no real way to test these filters work, since the `filter`
       // property is read-only in Synthizer land.

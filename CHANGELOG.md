@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0]
+
+### Changed
+
+* Changed the API to keep in line with [ziggurat]([URL](https://pub.dev/packages/ziggurat)).
+
 ## [0.2.3]
 
 ### Changed
