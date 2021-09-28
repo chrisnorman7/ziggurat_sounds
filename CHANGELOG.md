@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.4]
+
+### Added
+
+* Added the `AssetStore` class.
+
 ## [0.3.3]
 
 ### Added

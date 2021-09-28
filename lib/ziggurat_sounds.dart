@@ -42,6 +42,7 @@ export 'src/buffer_cache.dart';
 export 'src/buffer_store.dart';
 export 'src/error.dart';
 export 'src/extensions.dart';
+export 'src/json/asset_store.dart';
 export 'src/json/data_file.dart';
 export 'src/json/vault_file.dart';
 export 'src/reverb.dart';
