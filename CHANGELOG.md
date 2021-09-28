@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.5]
+
+### Added
+
+* Added the `AssetStore.fromFile` constructor.
+
 ## [0.3.4]
 
 ### Added
