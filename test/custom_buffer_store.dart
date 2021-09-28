@@ -1,8 +1,8 @@
 /// Provides the [CustomBufferStore] class.
+import 'dart:io';
 import 'dart:math';
 
-import 'package:dart_synthizer/buffer.dart';
-import 'package:dart_synthizer/synthizer.dart';
+import 'package:dart_synthizer/dart_synthizer.dart';
 import 'package:ziggurat/ziggurat.dart';
 import 'package:ziggurat_sounds/ziggurat_sounds.dart';
 
@@ -13,5 +13,6 @@ class CustomBufferStore extends BufferStore {
       : super(random, synthizer);
 
   @override
-  Buffer getBuffer(SoundReference reference) => Buffer(synthizer);
+  Buffer getBuffer(AssetReference reference) =>
+      Buffer.fromFile(synthizer, File('sound.wav'));
 }

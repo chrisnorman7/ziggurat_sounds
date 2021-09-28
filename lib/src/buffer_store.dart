@@ -55,7 +55,7 @@ class BufferStore {
   final List<String> _protectedBufferCollections;
 
   /// add a buffer from a file.
-  Future<SoundReference> addFile(File file,
+  Future<AssetReference> addFile(File file,
       {String? name, bool protected = false}) async {
     final buffer = Buffer.fromBytes(synthizer, await file.readAsBytes());
     name ??= file.path;
@@ -63,11 +63,11 @@ class BufferStore {
     if (protected) {
       _protectedBufferFiles.add(name);
     }
-    return SoundReference.file(name);
+    return AssetReference.file(name);
   }
 
   /// Add a directory of files as a collection.
-  Future<SoundReference> addDirectory(Directory directory,
+  Future<AssetReference> addDirectory(Directory directory,
       {String? name, bool protected = false}) async {
     final buffers = <Buffer>[];
     for (final file in directory.listSync()) {
@@ -80,7 +80,7 @@ class BufferStore {
     if (protected) {
       _protectedBufferCollections.add(name);
     }
-    return SoundReference.collection(name);
+    return AssetReference.collection(name);
   }
 
   /// Add the contents of a vault file.
@@ -91,7 +91,7 @@ class BufferStore {
     for (final entry in vaultFile.files.entries) {
       final name = entry.key;
       if (_bufferFiles.containsKey(name)) {
-        throw DuplicateEntryError(this, name, SoundType.file);
+        throw DuplicateEntryError(this, name, AssetType.file);
       }
       _bufferFiles[name] =
           Buffer.fromBytes(synthizer, base64Decode(entry.value));
@@ -102,7 +102,7 @@ class BufferStore {
     for (final entry in vaultFile.folders.entries) {
       final name = entry.key;
       if (_bufferCollections.containsKey(name)) {
-        throw DuplicateEntryError(this, name, SoundType.collection);
+        throw DuplicateEntryError(this, name, AssetType.collection);
       }
       final buffers = <Buffer>[];
       for (final data in entry.value) {
@@ -171,15 +171,15 @@ class BufferStore {
   ///
   /// If no buffer is found by the given [reference], [NoSuchBufferError] will
   /// be thrown.
-  Buffer getBuffer(SoundReference reference) {
+  Buffer getBuffer(AssetReference reference) {
     switch (reference.type) {
-      case SoundType.file:
+      case AssetType.file:
         final buffer = _bufferFiles[reference.name];
         if (buffer != null) {
           return buffer;
         }
         break;
-      case SoundType.collection:
+      case AssetType.collection:
         final buffers = _bufferCollections[reference.name];
         if (buffers != null) {
           return buffers[random.nextInt(buffers.length)];
@@ -195,11 +195,11 @@ class BufferStore {
   /// valid reference.
   ///
   /// If nothing is found, [NoSuchBufferError] will be thrown.
-  SoundReference getSoundReference(String name) {
+  AssetReference getSoundReference(String name) {
     if (_bufferFiles.containsKey(name)) {
-      return SoundReference(name, SoundType.file);
+      return AssetReference.file(name);
     } else if (_bufferCollections.containsKey(name)) {
-      return SoundReference(name, SoundType.collection);
+      return AssetReference.collection(name);
     } else {
       throw NoSuchBufferError(name);
     }

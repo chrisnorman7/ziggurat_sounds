@@ -38,6 +38,7 @@ import 'package:ziggurat/ziggurat.dart';
 import 'src/sound_manager.dart';
 
 export 'src/audio_channel.dart';
+export 'src/buffer_cache.dart';
 export 'src/buffer_store.dart';
 export 'src/error.dart';
 export 'src/extensions.dart';

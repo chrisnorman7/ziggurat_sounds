@@ -16,12 +16,13 @@ import 'reverb.dart';
 /// Once you have a [Game] instance, you can hook up an instance to listen for
 /// events:
 ///
-/// ```game.sounds.listen(soundManager.handleEvent);
+/// ```
+/// game.sounds.listen(soundManager.handleEvent);
 /// ```
 class SoundManager {
   /// Create a sound manager.
-  SoundManager(this.context)
-      : bufferStores = <BufferStore>[],
+  SoundManager(this.context, {List<BufferStore>? bufferStores})
+      : bufferStores = bufferStores ?? <BufferStore>[],
         _reverbs = {},
         _channels = {},
         _sounds = {};
@@ -91,7 +92,7 @@ class SoundManager {
   ///
   /// If no buffer is found with the given [reference], [NoSuchBufferError] is
   /// thrown.
-  Buffer getBuffer(SoundReference reference) {
+  Buffer getBuffer(AssetReference reference) {
     for (final bufferStore in bufferStores) {
       try {
         return bufferStore.getBuffer(reference);
@@ -205,12 +206,17 @@ class SoundManager {
       getChannel(event.id).source.filter =
           BiquadConfig.designIdentity(context.synthizer);
     } else if (event is AutomationFade) {
-      getSound(event.id).setAutomation(Properties.gain, [
-        AutomationPoint(event.preFade, event.startGain),
-        AutomationPoint(event.preFade + event.fadeLength, event.endGain)
-      ]);
+      final sound = getSound(event.id);
+      context.executeAutomation(sound, [
+        AutomationAppendPropertyCommand(
+            event.preFade, Properties.gain, event.startGain),
+        AutomationAppendPropertyCommand(
+            event.fadeLength, Properties.gain, event.endGain)
+      ]).destroy();
     } else if (event is CancelAutomationFade) {
-      getSound(event.id).clearAutomation(Properties.gain);
+      final sound = getSound(event.id);
+      context.executeAutomation(
+          sound, [AutomationClearPropertyCommand(0.0, Properties.gain)]);
     } else {
       throw Exception('Cannot handle $event.');
     }

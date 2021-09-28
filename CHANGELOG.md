@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.3]
+
+### Added
+
+* Added the `BufferCache` class.
+
+## [0.3.2]
+
+### Changed
+
+* Updated Ziggurat.
+
+## [0.3.1]
+
+### Changed
+
+* Updated dart_synthizer.
+* Started using `lints` instead of `pedantic`.
+
 ## [0.3.0]
 
 ### Changed

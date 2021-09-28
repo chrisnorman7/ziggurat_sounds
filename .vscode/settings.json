@@ -11,6 +11,7 @@
     "Highpass",
     "Lf",
     "Lowpass",
+    "LRU",
     "math",
     "Rolloff",
     "sdl",

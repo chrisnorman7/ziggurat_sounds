@@ -15,7 +15,7 @@ class NoSuchBufferError extends ZigguratSoundsError {
   final String name;
 
   /// The type of the sound.
-  final SoundType? type;
+  final AssetType? type;
 
   /// Make it a string.
   @override
@@ -34,7 +34,7 @@ class DuplicateEntryError extends ZigguratSoundsError {
   final String name;
 
   /// The type of the entry that was supposed to be added.
-  final SoundType type;
+  final AssetType type;
 }
 
 /// No such channel was found.
