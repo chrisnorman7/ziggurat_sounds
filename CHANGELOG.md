@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1]
+
+### Added
+
+* Added a `bufferCache` property to `SoundManager`.
+
 ## [0.5.0]
 
 ### Changed

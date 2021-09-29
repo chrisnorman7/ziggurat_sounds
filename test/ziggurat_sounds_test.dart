@@ -225,7 +225,7 @@ void main() {
     });
   });
   group('SoundManager', () {
-    final soundManager = SoundManager(context);
+    var soundManager = SoundManager(context);
     final bufferStore = BufferStore(Random(), synthizer);
     test('.bufferStores', () {
       expect(soundManager.bufferStores, isEmpty);
@@ -241,6 +241,13 @@ void main() {
       soundManager.bufferStores.add(bufferStore);
       expect(soundManager.getBuffer(AssetReference.file('silence.wav')),
           isA<Buffer>());
+      soundManager = SoundManager(context,
+          bufferCache: BufferCache(
+              synthizer: synthizer,
+              maxSize: pow(1024, 3).floor(),
+              random: random));
+      final buffer = soundManager.getBuffer(AssetReference.file('sound.wav'));
+      expect(buffer, isA<Buffer>());
     });
     test('.getChannel', () {
       expect(

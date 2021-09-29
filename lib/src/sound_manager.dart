@@ -3,6 +3,7 @@ import 'package:dart_synthizer/dart_synthizer.dart';
 import 'package:ziggurat/ziggurat.dart';
 
 import 'audio_channel.dart';
+import 'buffer_cache.dart';
 import 'buffer_store.dart';
 import 'error.dart';
 import 'extensions.dart';
@@ -21,7 +22,8 @@ import 'reverb.dart';
 /// ```
 class SoundManager {
   /// Create a sound manager.
-  SoundManager(this.context, {List<BufferStore>? bufferStores})
+  SoundManager(this.context,
+      {List<BufferStore>? bufferStores, this.bufferCache})
       : bufferStores = bufferStores ?? <BufferStore>[],
         _reverbs = {},
         _channels = {},
@@ -35,6 +37,12 @@ class SoundManager {
   /// You can add and remove buffer stores from this list, but if the list is
   /// empty, the [getBuffer] method will always fail.
   final List<BufferStore> bufferStores;
+
+  /// The buffer cache to use.
+  ///
+  /// If [getBuffer] doesn't find any results in any of [bufferStores], then
+  /// this cache will be used, assuming it's not `null`.
+  final BufferCache? bufferCache;
 
   /// The reverbs that have been registered.
   ///
@@ -99,6 +107,10 @@ class SoundManager {
       } on NoSuchBufferError {
         continue;
       }
+    }
+    final cache = bufferCache;
+    if (cache != null) {
+      return cache.getBuffer(reference);
     }
     throw NoSuchBufferError(reference.name, type: reference.type);
   }
