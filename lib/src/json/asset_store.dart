@@ -42,8 +42,11 @@ class AssetReferenceReference {
 @JsonSerializable()
 class AssetStore with DumpLoadMixin {
   /// Create an instance.
-  AssetStore(this.filename,
-      {this.comment, List<AssetReferenceReference>? assets})
+  AssetStore(
+      {required this.filename,
+      required this.destination,
+      this.comment,
+      List<AssetReferenceReference>? assets})
       : assets = assets ?? [];
 
   /// Create an instance from a JSON object.
@@ -59,6 +62,12 @@ class AssetStore with DumpLoadMixin {
   /// The dart filename for this store.
   final String filename;
 
+  /// The directory where all files will end up.
+  final String destination;
+
+  /// The directory where assets will reside.
+  Directory get directory => Directory(destination);
+
   /// The comment at the top of the resulting dart file.
   final String? comment;
 
@@ -69,24 +78,38 @@ class AssetStore with DumpLoadMixin {
   @override
   Map<String, dynamic> toJson() => _$AssetStoreToJson(this);
 
+  /// Get an unused filename.
+  String getNextFilename({String suffix = ''}) {
+    var i = 0;
+    while (true) {
+      final filename = '$i$suffix';
+      final file = File(filename);
+      final directory = Directory(filename);
+      if (file.existsSync() == false && directory.existsSync() == false) {
+        return filename;
+      }
+      i++;
+    }
+  }
+
   /// Import a single file.
   ///
-  /// This method will encrypt [file], and place it in [directory].
+  /// This method will encrypt [file], and place it in [destination].
   AssetReferenceReference importFile(
-      {required File file,
-      required Directory directory,
-      required String variableName,
-      String? comment}) {
-    final filename = path.basename(file.path) + '.encrypted';
+      {required File file, required String variableName, String? comment}) {
+    if (directory.existsSync() == false) {
+      directory.createSync();
+    }
+    final filename =
+        path.join(destination, getNextFilename(suffix: '.encrypted'));
     final encryptionKey = SecureRandom(32).base64;
     final key = Key.fromBase64(encryptionKey);
     final iv = IV.fromLength(16);
     final encrypter = Encrypter(AES(key));
     final data = encrypter.encryptBytes(file.readAsBytesSync(), iv: iv).bytes;
-    final destination = File(path.join(directory.path, filename))
-      ..writeAsBytesSync(data);
+    File(filename).writeAsBytesSync(data);
     final reference =
-        AssetReference.file(destination.path, encryptionKey: encryptionKey);
+        AssetReference.file(filename, encryptionKey: encryptionKey);
     final assetReferenceReference = AssetReferenceReference(
         variableName: variableName, reference: reference, comment: comment);
     assets.add(assetReferenceReference);
@@ -98,24 +121,28 @@ class AssetStore with DumpLoadMixin {
   /// This method will copy an encrypted version of every file from [directory]
   /// to [destination].
   AssetReferenceReference importDirectory(
-      {required Directory directory,
-      required Directory destination,
+      {required Directory source,
       required String variableName,
       String? comment}) {
+    if (directory.existsSync() == false) {
+      directory.createSync();
+    }
+    final directoryName = path.join(destination, getNextFilename());
+    Directory(directoryName).createSync();
     final encryptionKey = SecureRandom(32).base64;
     final key = Key.fromBase64(encryptionKey);
     final iv = IV.fromLength(16);
     final encrypter = Encrypter(AES(key));
-    for (final entity in directory.listSync()) {
+    for (final entity in source.listSync()) {
       if (entity is File) {
         final filename = path.basename(entity.path) + '.encrypted';
         final data =
             encrypter.encryptBytes(entity.readAsBytesSync(), iv: iv).bytes;
-        File(path.join(destination.path, filename)).writeAsBytesSync(data);
+        File(path.join(directoryName, filename)).writeAsBytesSync(data);
       }
     }
-    final reference = AssetReference.collection(destination.path,
-        encryptionKey: encryptionKey);
+    final reference =
+        AssetReference.collection(directoryName, encryptionKey: encryptionKey);
     final assetReferenceReference = AssetReferenceReference(
         variableName: variableName, reference: reference, comment: comment);
     assets.add(assetReferenceReference);

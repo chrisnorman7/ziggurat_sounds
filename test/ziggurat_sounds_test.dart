@@ -378,69 +378,73 @@ void main() {
     });
   });
   group('AssetStore', () {
-    late Directory tempDirectory;
-    setUp(() => tempDirectory = Directory('.').createTempSync());
-    tearDown(() => tempDirectory.deleteSync(recursive: true));
     test('Initialise', () {
-      var store = AssetStore('test.dart');
+      var store = AssetStore(filename: 'test.dart', destination: 'assets');
       expect(store.filename, equals('test.dart'));
+      expect(store.destination, equals('assets'));
       expect(store.comment, isNull);
       expect(store.assets, isEmpty);
-      store = AssetStore(store.filename, comment: 'Testing.');
+      store = AssetStore(
+          filename: store.filename,
+          destination: store.destination,
+          comment: 'Testing.');
       expect(store.filename, equals('test.dart'));
+      expect(store.destination, equals('assets'));
       expect(store.assets, isEmpty);
       expect(store.comment, equals('Testing.'));
-      store = AssetStore(store.filename, assets: [
-        AssetReferenceReference(
-            variableName: 'firstFile',
-            reference: AssetReference.file('file1.wav')),
-        AssetReferenceReference(
-            variableName: 'firstDirectory',
-            reference: AssetReference.collection('directory1'))
-      ]);
+      store = AssetStore(
+          filename: store.filename,
+          destination: store.destination,
+          assets: [
+            AssetReferenceReference(
+                variableName: 'firstFile',
+                reference: AssetReference.file('file1.wav')),
+            AssetReferenceReference(
+                variableName: 'firstDirectory',
+                reference: AssetReference.collection('directory1'))
+          ]);
       expect(store.filename, equals('test.dart'));
+      expect(store.destination, equals('assets'));
       expect(store.comment, isNull);
       expect(store.assets.length, equals(2));
     });
     test('.importFile', () {
       final random = Random();
-      final store = AssetStore('test.dart');
+      final store = AssetStore(filename: 'test.dart', destination: 'assets');
       final file = File('SDL2.dll');
       final reference = store.importFile(
-          file: file,
-          directory: tempDirectory,
-          variableName: 'sdlDll',
-          comment: 'The SDL DLL.');
+          file: file, variableName: 'sdlDll', comment: 'The SDL DLL.');
       expect(reference, isA<AssetReferenceReference>());
-      expect(tempDirectory.listSync().length, equals(1));
-      final sdlDll = tempDirectory.listSync().first;
+      expect(store.directory.listSync().length, equals(1));
+      final sdlDll = store.directory.listSync().first;
       expect(sdlDll, isA<File>());
       sdlDll as File;
-      expect(sdlDll.path,
-          equals(path.join(tempDirectory.path, file.path + '.encrypted')));
+      expect(sdlDll.path, equals(path.join(store.destination, '0.encrypted')));
       expect(store.assets.length, equals(1));
       expect(store.assets.first, equals(reference));
       expect(reference.variableName, equals('sdlDll'));
       expect(reference.comment, equals('The SDL DLL.'));
       expect(reference.reference.name,
-          equals(path.join(tempDirectory.path, file.path + '.encrypted')));
+          equals(path.join(store.destination, '0.encrypted')));
       expect(reference.reference.type, equals(AssetType.file));
       expect(reference.reference.load(random), equals(file.readAsBytesSync()));
+      store.directory.deleteSync(recursive: true);
     });
     test('.importDirectory', () {
       final testDirectory = Directory('test');
-      final store = AssetStore('test.dart');
+      final store = AssetStore(filename: 'test.dart', destination: 'assets');
       final reference = store.importDirectory(
-          directory: testDirectory,
-          destination: tempDirectory,
+          source: testDirectory,
           variableName: 'tests',
           comment: 'Tests directory.');
       expect(reference, isA<AssetReferenceReference>());
+      expect(
+          reference.reference.name, equals(path.join(store.destination, '0')));
       expect(store.assets.length, equals(1));
       expect(store.assets.first, equals(reference));
       final unencryptedEntities = testDirectory.listSync()
         ..sort((a, b) => a.path.compareTo(b.path));
-      final encryptedEntities = tempDirectory.listSync()
+      final encryptedEntities = Directory(reference.reference.name).listSync()
         ..sort((a, b) => a.path.compareTo(b.path));
       expect(unencryptedEntities.length, equals(encryptedEntities.length));
       for (var i = 0; i < unencryptedEntities.length; i++) {
@@ -458,18 +462,16 @@ void main() {
             reason: 'File ${encryptedFile.path} did not decrypt to '
                 '${unencryptedFile.path}.');
       }
+      store.directory.deleteSync(recursive: true);
     });
     test('Import both', () {
-      final store = AssetStore('test.dart')
-        ..importFile(
-            file: File('SDL2.dll'),
-            directory: tempDirectory,
-            variableName: 'sdlDll')
+      final store = AssetStore(filename: 'test.dart', destination: 'assets')
+        ..importFile(file: File('SDL2.dll'), variableName: 'sdlDll')
         ..importDirectory(
-            directory: Directory('test'),
-            destination: tempDirectory,
-            variableName: 'testsDirectory');
+            source: Directory('test'), variableName: 'testsDirectory');
       expect(store.assets.length, equals(2));
+      expect(store.directory.listSync().length, equals(2));
+      store.directory.deleteSync(recursive: true);
     });
   });
 }

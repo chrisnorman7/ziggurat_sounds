@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.0]
+
+### Added
+
+* Add a `destination` field to `AssetStore`.
+
+### Changed
+
+* The `AssetStore` class now chooses your file and directory names for you.
+* Changed the signature for the `AssetStore` constructor.
+
 ## [0.3.5]
 
 ### Added

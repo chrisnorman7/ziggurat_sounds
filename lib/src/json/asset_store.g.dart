@@ -24,7 +24,8 @@ Map<String, dynamic> _$AssetReferenceReferenceToJson(
     };
 
 AssetStore _$AssetStoreFromJson(Map<String, dynamic> json) => AssetStore(
-      json['filename'] as String,
+      filename: json['filename'] as String,
+      destination: json['destination'] as String,
       comment: json['comment'] as String?,
       assets: (json['assets'] as List<dynamic>?)
           ?.map((e) =>
@@ -35,6 +36,7 @@ AssetStore _$AssetStoreFromJson(Map<String, dynamic> json) => AssetStore(
 Map<String, dynamic> _$AssetStoreToJson(AssetStore instance) =>
     <String, dynamic>{
       'filename': instance.filename,
+      'destination': instance.destination,
       'comment': instance.comment,
       'assets': instance.assets,
     };
