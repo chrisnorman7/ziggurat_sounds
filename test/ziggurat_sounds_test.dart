@@ -222,7 +222,7 @@ void main() {
           channelObject.sounds[sound.id],
           predicate(
               (value) => value is BufferGenerator && value.looping == true));
-    }, skip: true);
+    });
   });
   group('SoundManager', () {
     final soundManager = SoundManager(context);
