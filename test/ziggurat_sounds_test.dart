@@ -412,8 +412,8 @@ void main() {
       final random = Random();
       final store = AssetStore(filename: 'test.dart', destination: 'assets');
       final file = File('SDL2.dll');
-      final reference = store.importFile(
-          file: file, variableName: 'sdlDll', comment: 'The SDL DLL.');
+      var reference = store.importFile(
+          source: file, variableName: 'sdlDll', comment: 'The SDL DLL.');
       expect(reference, isA<AssetReferenceReference>());
       expect(store.directory.listSync().length, equals(1));
       final sdlDll = store.directory.listSync().first;
@@ -428,6 +428,12 @@ void main() {
           equals(path.join(store.destination, '0.encrypted')));
       expect(reference.reference.type, equals(AssetType.file));
       expect(reference.reference.load(random), equals(file.readAsBytesSync()));
+      reference = store.importFile(
+          source: File('pubspec.yaml'), variableName: 'pubSpec');
+      expect(reference.variableName, equals('pubSpec'));
+      expect(store.directory.listSync().length, equals(2));
+      expect(reference.reference.name,
+          equals(path.join(store.destination, '1.encrypted')));
       store.directory.deleteSync(recursive: true);
     });
     test('.importDirectory', () {
@@ -466,7 +472,7 @@ void main() {
     });
     test('Import both', () {
       final store = AssetStore(filename: 'test.dart', destination: 'assets')
-        ..importFile(file: File('SDL2.dll'), variableName: 'sdlDll')
+        ..importFile(source: File('SDL2.dll'), variableName: 'sdlDll')
         ..importDirectory(
             source: Directory('test'), variableName: 'testsDirectory');
       expect(store.assets.length, equals(2));

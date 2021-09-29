@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0]
+
+### Changed
+
+* Renamed the `file` argument of `AssetStore.importFile` to `source`, to bring it in line with`AssetStore.importDirectory`.
+* Fixed a bug in `AssetStore.getNextFilename`.
+* Make `AssetStore.getNextFilename` return a fully-qualified filename.
+
 ## [0.4.0]
 
 ### Added

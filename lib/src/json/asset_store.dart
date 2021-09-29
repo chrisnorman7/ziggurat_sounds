@@ -82,10 +82,9 @@ class AssetStore with DumpLoadMixin {
   String getNextFilename({String suffix = ''}) {
     var i = 0;
     while (true) {
-      final filename = '$i$suffix';
-      final file = File(filename);
-      final directory = Directory(filename);
-      if (file.existsSync() == false && directory.existsSync() == false) {
+      final filename = path.join(destination, '$i$suffix');
+      if (File(filename).existsSync() == false &&
+          Directory(filename).existsSync() == false) {
         return filename;
       }
       i++;
@@ -94,19 +93,18 @@ class AssetStore with DumpLoadMixin {
 
   /// Import a single file.
   ///
-  /// This method will encrypt [file], and place it in [destination].
+  /// This method will encrypt [source], and place it in [destination].
   AssetReferenceReference importFile(
-      {required File file, required String variableName, String? comment}) {
+      {required File source, required String variableName, String? comment}) {
     if (directory.existsSync() == false) {
       directory.createSync();
     }
-    final filename =
-        path.join(destination, getNextFilename(suffix: '.encrypted'));
+    final filename = getNextFilename(suffix: '.encrypted');
     final encryptionKey = SecureRandom(32).base64;
     final key = Key.fromBase64(encryptionKey);
     final iv = IV.fromLength(16);
     final encrypter = Encrypter(AES(key));
-    final data = encrypter.encryptBytes(file.readAsBytesSync(), iv: iv).bytes;
+    final data = encrypter.encryptBytes(source.readAsBytesSync(), iv: iv).bytes;
     File(filename).writeAsBytesSync(data);
     final reference =
         AssetReference.file(filename, encryptionKey: encryptionKey);
@@ -127,7 +125,7 @@ class AssetStore with DumpLoadMixin {
     if (directory.existsSync() == false) {
       directory.createSync();
     }
-    final directoryName = path.join(destination, getNextFilename());
+    final directoryName = getNextFilename();
     Directory(directoryName).createSync();
     final encryptionKey = SecureRandom(32).base64;
     final key = Key.fromBase64(encryptionKey);

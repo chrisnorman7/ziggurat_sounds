@@ -13,6 +13,7 @@
     "Lowpass",
     "LRU",
     "math",
+    "pubspec",
     "Rolloff",
     "sdl",
     "synthizer",
