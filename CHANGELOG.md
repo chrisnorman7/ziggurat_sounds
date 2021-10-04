@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.3]
+
+Added
+
+* Implement the new ziggurat events.
+
+### Changed
+
+* Update ziggurat.
+
 ## [0.5.2]
 
 ### Changed

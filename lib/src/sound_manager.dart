@@ -229,6 +229,22 @@ class SoundManager {
       final sound = getSound(event.id);
       context.executeAutomation(
           sound, [AutomationClearPropertyCommand(0.0, Properties.gain)]);
+    } else if (event is SetDefaultPannerStrategy) {
+      final PannerStrategy strategy;
+      switch (event.strategy) {
+        case DefaultPannerStrategy.stereo:
+          strategy = PannerStrategy.stereo;
+          break;
+        case DefaultPannerStrategy.hrtf:
+          strategy = PannerStrategy.hrtf;
+          break;
+      }
+      context.defaultPannerStrategy = strategy;
+    } else if (event is ListenerPositionEvent) {
+      context.position = Double3(event.x, event.y, event.z);
+    } else if (event is ListenerOrientationEvent) {
+      context.orientation =
+          Double6(event.x1, event.y1, event.z1, event.x2, event.y2, event.z2);
     } else {
       throw Exception('Cannot handle $event.');
     }

@@ -224,6 +224,47 @@ void main() {
               (value) => value is BufferGenerator && value.looping == true));
     });
   });
+  group('Global settings', () {
+    test('set default panner strategy', () async {
+      expect(context.defaultPannerStrategy, equals(PannerStrategy.stereo));
+      game.setDefaultPannerStrategy(DefaultPannerStrategy.hrtf);
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(context.defaultPannerStrategy, equals(PannerStrategy.hrtf));
+      game.setDefaultPannerStrategy(DefaultPannerStrategy.stereo);
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(context.defaultPannerStrategy, equals(PannerStrategy.stereo));
+    });
+    test('Set listener position', () async {
+      game.setListenerPosition(1.0, 2.0, 3.0);
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(context.position, equals(Double3(1.0, 2.0, 3.0)));
+      game.setListenerPosition(10.0, 20.0, 30.0);
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      expect(context.position, equals(Double3(10.0, 20.0, 30.0)));
+    });
+    test('Set listener orientation', () async {
+      var angle = 180.0;
+      game.setListenerOrientation(angle);
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      var orientation = context.orientation;
+      expect(orientation.x1, equals(sin(angle * pi / 180)));
+      expect(orientation.y1, equals(cos(angle * pi / 180.0)));
+      expect(orientation.z1, isZero);
+      expect(orientation.x2, isZero);
+      expect(orientation.y2, isZero);
+      expect(orientation.z2, equals(1));
+      angle = 90.0;
+      game.setListenerOrientation(angle);
+      await Future<void>.delayed(Duration(milliseconds: 200));
+      orientation = context.orientation;
+      expect(orientation.x1, equals(sin(angle * pi / 180)));
+      expect(orientation.y1, equals(cos(angle * pi / 180.0)));
+      expect(orientation.z1, isZero);
+      expect(orientation.x2, isZero);
+      expect(orientation.y2, isZero);
+      expect(orientation.z2, equals(1));
+    });
+  });
   group('SoundManager', () {
     var soundManager = SoundManager(context);
     final bufferStore = BufferStore(Random(), synthizer);
