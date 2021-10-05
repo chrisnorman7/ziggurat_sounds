@@ -23,7 +23,8 @@ void main() {
   });
   final buffers = CustomBufferStore(Random(), synthizer);
   final game = Game('Sounds');
-  final soundManager = CustomSoundManager(context)..bufferStores.add(buffers);
+  final soundManager = CustomSoundManager(game, context)
+    ..bufferStores.add(buffers);
   game.sounds.listen(soundManager.handleEvent);
   group('Initialisation', () {
     test('Ensure initialisation', () async {
@@ -266,7 +267,7 @@ void main() {
     });
   });
   group('SoundManager', () {
-    var soundManager = SoundManager(context);
+    var soundManager = SoundManager(game, context);
     final bufferStore = BufferStore(Random(), synthizer);
     test('.bufferStores', () {
       expect(soundManager.bufferStores, isEmpty);
@@ -282,7 +283,7 @@ void main() {
       soundManager.bufferStores.add(bufferStore);
       expect(soundManager.getBuffer(AssetReference.file('silence.wav')),
           isA<Buffer>());
-      soundManager = SoundManager(context,
+      soundManager = SoundManager(game, context,
           bufferCache: BufferCache(
               synthizer: synthizer,
               maxSize: pow(1024, 3).floor(),

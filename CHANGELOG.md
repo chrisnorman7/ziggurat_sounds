@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0]
+
+### Changed
+
+* It is now necessary to create `SoundManager` instances with a `game` argument.
+
 ## [0.5.3]
 
 Added

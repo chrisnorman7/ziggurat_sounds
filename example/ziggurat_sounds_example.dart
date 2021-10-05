@@ -17,9 +17,10 @@ Future<void> main() async {
   print('Added aim.wav.');
   await bufferStore.addFile(File('shot.wav'));
   print('Added shot.wav.');
-  final soundManager = SoundManager(ctx)..bufferStores.add(bufferStore);
+  final game = Game('Sounds Example');
+  final soundManager = SoundManager(game, ctx)..bufferStores.add(bufferStore);
   print('Created a sound manager.');
-  final game = Game('Sounds Example')..sounds.listen(soundManager.handleEvent);
+  game.sounds.listen(soundManager.handleEvent);
   print(
       'Created a game and registered the sound manager to listen for events.');
   game.interfaceSounds.playSound(bufferStore.getSoundReference('aim.wav'));

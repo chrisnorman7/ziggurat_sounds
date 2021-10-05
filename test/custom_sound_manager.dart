@@ -6,9 +6,9 @@ import 'package:ziggurat_sounds/ziggurat_sounds.dart';
 /// A sound manager that saves all events.
 class CustomSoundManager extends SoundManager {
   /// Create an instance.
-  CustomSoundManager(Context context)
+  CustomSoundManager(Game game, Context context)
       : events = [],
-        super(context);
+        super(game, context);
 
   /// All the events that have been processed.
   final List<SoundEvent> events;

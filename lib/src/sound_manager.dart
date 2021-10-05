@@ -22,12 +22,15 @@ import 'reverb.dart';
 /// ```
 class SoundManager {
   /// Create a sound manager.
-  SoundManager(this.context,
+  SoundManager(this.game, this.context,
       {List<BufferStore>? bufferStores, this.bufferCache})
       : bufferStores = bufferStores ?? <BufferStore>[],
         _reverbs = {},
         _channels = {},
         _sounds = {};
+
+  /// The game to use.
+  final Game game;
 
   /// The synthizer context to use.
   final Context context;
@@ -220,15 +223,18 @@ class SoundManager {
     } else if (event is AutomationFade) {
       final sound = getSound(event.id);
       context.executeAutomation(sound, [
+        AutomationAppendPropertyCommand(game.runDurationSeconds + event.preFade,
+            Properties.gain, event.startGain),
         AutomationAppendPropertyCommand(
-            event.preFade, Properties.gain, event.startGain),
-        AutomationAppendPropertyCommand(
-            event.fadeLength, Properties.gain, event.endGain)
+            game.runDurationSeconds + event.fadeLength,
+            Properties.gain,
+            event.endGain)
       ]).destroy();
     } else if (event is CancelAutomationFade) {
       final sound = getSound(event.id);
-      context.executeAutomation(
-          sound, [AutomationClearPropertyCommand(0.0, Properties.gain)]);
+      context.executeAutomation(sound, [
+        AutomationClearPropertyCommand(game.runDurationSeconds, Properties.gain)
+      ]);
     } else if (event is SetDefaultPannerStrategy) {
       final PannerStrategy strategy;
       switch (event.strategy) {
