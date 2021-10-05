@@ -50,25 +50,29 @@ void main() {
   group('Create and destroy stuff', () {
     test('Reverb', () async {
       final preset = ReverbPreset('Test Reverb');
-      final reverb = game.createReverb(preset);
-      await Future<void>.delayed(Duration.zero);
+      expect(preset.gain, equals(0.5));
+      final reverbEvent = game.createReverb(preset);
+      expect(reverbEvent.reverb, equals(preset));
+      await Future<void>.delayed(Duration(milliseconds: 100));
       expect(soundManager.events.length, equals(3));
-      expect(soundManager.events.last, equals(reverb));
+      expect(soundManager.events.last, equals(reverbEvent));
+      final reverb = soundManager.getReverb(SoundEvent.maxEventId);
       expect(
-          soundManager.getReverb(SoundEvent.maxEventId),
+          reverb,
           predicate((value) =>
               value is Reverb &&
               value.name == preset.name &&
               value.reverb is GlobalFdnReverb));
-      reverb.destroy();
+      expect(reverb.reverb.gain, equals(preset.gain));
+      reverbEvent.destroy();
       await Future<void>.delayed(Duration.zero);
-      expect(() => soundManager.getReverb(reverb.id),
+      expect(() => soundManager.getReverb(reverbEvent.id),
           throwsA(isA<NoSuchReverbError>()));
       expect(soundManager.events.length, equals(4));
       expect(
           soundManager.events.last,
           predicate(
-              (value) => value is DestroyReverb && value.id == reverb.id));
+              (value) => value is DestroyReverb && value.id == reverbEvent.id));
     });
     test('Channel', () async {
       var length = soundManager.events.length;
@@ -457,9 +461,27 @@ void main() {
       expect(store.comment, isNull);
       expect(store.assets.length, equals(2));
     });
+    test('.getNextFilename', () {
+      final store = AssetStore(filename: 'test.dart', destination: 'assets');
+      if (store.directory.existsSync()) {
+        store.directory.deleteSync(recursive: true);
+      }
+      expect(store.getNextFilename(), equals('${store.destination}/0'));
+      store.directory.createSync();
+      expect(store.getNextFilename(), equals('${store.destination}/0'));
+      expect(store.getNextFilename(suffix: '.asdf'),
+          equals('${store.destination}/0.asdf'));
+      File('${store.destination}/0').writeAsStringSync('Testing');
+      expect(store.getNextFilename(), equals('${store.destination}/1'));
+      store.directory.deleteSync(recursive: true);
+    });
     test('.importFile', () {
       final random = Random();
-      final store = AssetStore(filename: 'test.dart', destination: 'assets');
+      final store =
+          AssetStore(filename: 'test.dart', destination: 'test.importFile');
+      if (store.directory.existsSync()) {
+        store.directory.deleteSync(recursive: true);
+      }
       final file = File('SDL2.dll');
       var reference = store.importFile(
           source: file, variableName: 'sdlDll', comment: 'The SDL DLL.');
@@ -473,28 +495,31 @@ void main() {
       expect(store.assets.first, equals(reference));
       expect(reference.variableName, equals('sdlDll'));
       expect(reference.comment, equals('The SDL DLL.'));
-      expect(reference.reference.name,
-          equals(path.join(store.destination, '0.encrypted')));
+      expect(
+          reference.reference.name, equals('${store.destination}/0.encrypted'));
       expect(reference.reference.type, equals(AssetType.file));
       expect(reference.reference.load(random), equals(file.readAsBytesSync()));
       reference = store.importFile(
           source: File('pubspec.yaml'), variableName: 'pubSpec');
       expect(reference.variableName, equals('pubSpec'));
       expect(store.directory.listSync().length, equals(2));
-      expect(reference.reference.name,
-          equals(path.join(store.destination, '1.encrypted')));
+      expect(
+          reference.reference.name, equals('${store.destination}/1.encrypted'));
       store.directory.deleteSync(recursive: true);
     });
     test('.importDirectory', () {
       final testDirectory = Directory('test');
-      final store = AssetStore(filename: 'test.dart', destination: 'assets');
+      final store = AssetStore(
+          filename: 'test.dart', destination: 'test.importDirectory');
+      if (store.directory.existsSync()) {
+        store.directory.deleteSync(recursive: true);
+      }
       final reference = store.importDirectory(
           source: testDirectory,
           variableName: 'tests',
           comment: 'Tests directory.');
       expect(reference, isA<AssetReferenceReference>());
-      expect(
-          reference.reference.name, equals(path.join(store.destination, '0')));
+      expect(reference.reference.name, equals('${store.destination}/0'));
       expect(store.assets.length, equals(1));
       expect(store.assets.first, equals(reference));
       final unencryptedEntities = testDirectory.listSync()
@@ -520,7 +545,15 @@ void main() {
       store.directory.deleteSync(recursive: true);
     });
     test('Import both', () {
-      final store = AssetStore(filename: 'test.dart', destination: 'assets')
+      final store = AssetStore(filename: 'test.dart', destination: 'assets');
+      if (store.directory.existsSync()) {
+        store.directory.deleteSync(recursive: true);
+      }
+      final dartFile = File(store.filename);
+      if (dartFile.existsSync()) {
+        dartFile.deleteSync();
+      }
+      store
         ..importFile(source: File('SDL2.dll'), variableName: 'sdlDll')
         ..importDirectory(
             source: Directory('test'), variableName: 'testsDirectory');

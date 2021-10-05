@@ -82,10 +82,10 @@ class AssetStore with DumpLoadMixin {
   String getNextFilename({String suffix = ''}) {
     var i = 0;
     while (true) {
-      final filename = path.join(destination, '$i$suffix');
-      if (File(filename).existsSync() == false &&
-          Directory(filename).existsSync() == false) {
-        return filename;
+      final fname = '${destination}/$i$suffix';
+      if (File(fname).existsSync() == false &&
+          Directory(fname).existsSync() == false) {
+        return fname;
       }
       i++;
     }
@@ -99,15 +99,14 @@ class AssetStore with DumpLoadMixin {
     if (directory.existsSync() == false) {
       directory.createSync();
     }
-    final filename = getNextFilename(suffix: '.encrypted');
+    final fname = getNextFilename(suffix: '.encrypted');
     final encryptionKey = SecureRandom(32).base64;
     final key = Key.fromBase64(encryptionKey);
     final iv = IV.fromLength(16);
     final encrypter = Encrypter(AES(key));
     final data = encrypter.encryptBytes(source.readAsBytesSync(), iv: iv).bytes;
-    File(filename).writeAsBytesSync(data);
-    final reference =
-        AssetReference.file(filename, encryptionKey: encryptionKey);
+    File(fname).writeAsBytesSync(data);
+    final reference = AssetReference.file(fname, encryptionKey: encryptionKey);
     final assetReferenceReference = AssetReferenceReference(
         variableName: variableName, reference: reference, comment: comment);
     assets.add(assetReferenceReference);
