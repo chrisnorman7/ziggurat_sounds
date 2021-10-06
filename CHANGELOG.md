@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.2]
+
+### Changed
+
+* Update ziggurat.
+
 ## [0.6.1]
 
 ### Changed
@@ -14,7 +20,7 @@
 
 ## [0.5.3]
 
-Added
+### Added
 
 * Implement the new ziggurat events.
 
