@@ -1,10 +1,16 @@
 # Changelog
 
-## [0.6.3]
+## [0.6.4]
 
 ### Changed
 
 * Update ziggurat.
+
+## [0.6.3]
+
+### Changed
+
+* Updated ziggurat.
 
 ## [0.6.2]
 

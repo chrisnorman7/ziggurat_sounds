@@ -144,11 +144,11 @@ class SoundManager {
         final reverb = getReverb(reverbId);
         context.ConfigRoute(source, reverb.reverb);
       }
-      _channels[event.id] = AudioChannel(event.id, source);
+      _channels[event.id!] = AudioChannel(event.id!, source);
     } else if (event is SetSoundChannelGain) {
-      getChannel(event.id).source.gain = event.gain;
+      getChannel(event.id!).source.gain = event.gain;
     } else if (event is SetSoundChannelPosition) {
-      final channel = getChannel(event.id);
+      final channel = getChannel(event.id!);
       final position = event.position;
       if (position is SoundPosition3d) {
         (channel.source as Source3D).position =
@@ -163,15 +163,15 @@ class SoundManager {
         // Nothing to do.
       }
     } else if (event is DestroySoundChannel) {
-      final channel = getChannel(event.id);
+      final channel = getChannel(event.id!);
       _channels.remove(event.id);
       channel.destroy();
     } else if (event is CreateReverb) {
       final reverb =
           Reverb(event.reverb.name, event.reverb.makeReverb(context));
-      _reverbs[event.id] = reverb;
+      _reverbs[event.id!] = reverb;
     } else if (event is DestroyReverb) {
-      final reverb = getReverb(event.id);
+      final reverb = getReverb(event.id!);
       _reverbs.remove(event.id);
       reverb.reverb.destroy();
     } else if (event is PlaySound) {
@@ -181,8 +181,8 @@ class SoundManager {
         ..gain = event.gain
         ..setBuffer(getBuffer(event.sound));
       if (event.keepAlive) {
-        channel.sounds[event.id] = generator;
-        _sounds[event.id] = generator;
+        channel.sounds[event.id!] = generator;
+        _sounds[event.id!] = generator;
       } else {
         generator.configDeleteBehavior(linger: true);
       }
@@ -190,38 +190,38 @@ class SoundManager {
     } else if (event is DestroySound) {
       final sound = _sounds.remove(event.id);
       if (sound == null) {
-        throw NoSuchSoundError(event.id);
+        throw NoSuchSoundError(event.id!);
       }
       for (final channel in _channels.values) {
         channel.sounds.remove(event.id);
       }
       sound.destroy();
     } else if (event is PauseSound) {
-      getSound(event.id).pause();
+      getSound(event.id!).pause();
     } else if (event is UnpauseSound) {
-      getSound(event.id).play();
+      getSound(event.id!).play();
     } else if (event is SetLoop) {
-      getSound(event.id).looping = event.looping;
+      getSound(event.id!).looping = event.looping;
     } else if (event is SetSoundGain) {
-      getSound(event.id).gain = event.gain;
+      getSound(event.id!).gain = event.gain;
     } else if (event is SetSoundPitchBend) {
-      getSound(event.id)..pitchBend = event.pitchBend;
+      getSound(event.id!)..pitchBend = event.pitchBend;
     } else if (event is SoundChannelHighpass) {
-      getChannel(event.id).source.filter = BiquadConfig.designHighpass(
+      getChannel(event.id!).source.filter = BiquadConfig.designHighpass(
           context.synthizer, event.frequency,
           q: event.q);
     } else if (event is SoundChannelLowpass) {
-      getChannel(event.id).source.filter = BiquadConfig.designLowpass(
+      getChannel(event.id!).source.filter = BiquadConfig.designLowpass(
           context.synthizer, event.frequency,
           q: event.q);
     } else if (event is SoundChannelBandpass) {
-      getChannel(event.id).source.filter = BiquadConfig.designBandpass(
+      getChannel(event.id!).source.filter = BiquadConfig.designBandpass(
           context.synthizer, event.frequency, event.bandwidth);
     } else if (event is SoundChannelFilter) {
-      getChannel(event.id).source.filter =
+      getChannel(event.id!).source.filter =
           BiquadConfig.designIdentity(context.synthizer);
     } else if (event is AutomationFade) {
-      final sound = getSound(event.id);
+      final sound = getSound(event.id!);
       context.executeAutomation(sound, [
         AutomationAppendPropertyCommand(game.runDurationSeconds + event.preFade,
             Properties.gain, event.startGain),
@@ -231,7 +231,7 @@ class SoundManager {
             event.endGain)
       ]).destroy();
     } else if (event is CancelAutomationFade) {
-      final sound = getSound(event.id);
+      final sound = getSound(event.id!);
       context.executeAutomation(sound, [
         AutomationClearPropertyCommand(game.runDurationSeconds, Properties.gain)
       ]);

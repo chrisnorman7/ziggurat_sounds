@@ -66,7 +66,7 @@ void main() {
       expect(reverb.reverb.gain, equals(preset.gain));
       reverbEvent.destroy();
       await Future<void>.delayed(Duration.zero);
-      expect(() => soundManager.getReverb(reverbEvent.id),
+      expect(() => soundManager.getReverb(reverbEvent.id!),
           throwsA(isA<NoSuchReverbError>()));
       expect(soundManager.events.length, equals(4));
       expect(
@@ -78,7 +78,7 @@ void main() {
       var length = soundManager.events.length;
       var channelEvent = game.createSoundChannel();
       await Future<void>.delayed(Duration(milliseconds: 200));
-      var channel = soundManager.getChannel(channelEvent.id);
+      var channel = soundManager.getChannel(channelEvent.id!);
       expect(soundManager.events.length, equals(length + 1));
       expect(channel.id, equals(channelEvent.id));
       expect(channel.sounds, isEmpty);
@@ -90,7 +90,7 @@ void main() {
       expect(source.gain, equals(1.4));
       channelEvent = game.createSoundChannel(position: SoundPositionScalar());
       await Future<void>.delayed(Duration(milliseconds: 200));
-      channel = soundManager.getChannel(channelEvent.id);
+      channel = soundManager.getChannel(channelEvent.id!);
       source = channel.source;
       if (source is ScalarPannedSource) {
         expect(source.panningScalar, isZero);
@@ -102,7 +102,7 @@ void main() {
       }
       channelEvent = game.createSoundChannel(position: SoundPositionAngular());
       await Future<void>.delayed(Duration(milliseconds: 200));
-      channel = soundManager.getChannel(channelEvent.id);
+      channel = soundManager.getChannel(channelEvent.id!);
       source = channel.source;
       if (source is AngularPannedSource) {
         expect(source.azimuth, isZero);
@@ -158,7 +158,7 @@ void main() {
       expect(event, isNot(isA<SoundChannelBandpass>()));
       channelEvent = game.createSoundChannel(position: SoundPosition3d());
       await Future<void>.delayed(Duration(milliseconds: 200));
-      channel = soundManager.getChannel(channelEvent.id);
+      channel = soundManager.getChannel(channelEvent.id!);
       source = channel.source;
       if (source is Source3D) {
         final position = source.position;
@@ -174,7 +174,7 @@ void main() {
       }
       channelEvent.destroy();
       await Future<void>.delayed(Duration.zero);
-      expect(() => soundManager.getChannel(channelEvent.id),
+      expect(() => soundManager.getChannel(channelEvent.id!),
           throwsA(isA<NoSuchChannelError>()));
     });
     test('Sound', () async {
@@ -185,7 +185,7 @@ void main() {
       expect(sound.keepAlive, isFalse);
       expect(() => sound.destroy(), throwsA(isA<DeadSound>()));
       await Future<void>.delayed(Duration.zero);
-      final channelObject = soundManager.getChannel(channel.id);
+      final channelObject = soundManager.getChannel(channel.id!);
       expect(channelObject.sounds[sound.id], isNull);
       sound = channel.playSound(AssetReference.file('another.wav'),
           keepAlive: true);
@@ -193,7 +193,7 @@ void main() {
       await Future<void>.delayed(Duration(milliseconds: 200));
       final generator = channelObject.sounds[sound.id]!;
       expect(generator, isA<BufferGenerator>());
-      expect(soundManager.getSound(sound.id), isA<BufferGenerator>());
+      expect(soundManager.getSound(sound.id!), isA<BufferGenerator>());
       // We know it is, but now Dart does too.
       expect(generator.gain, equals(sound.gain));
       sound.looping = true;
@@ -323,10 +323,10 @@ void main() {
       final soundEvent = PlaySound(
           game: game,
           sound: AssetReference.file('silence.wav'),
-          channel: game.interfaceSounds.id,
+          channel: game.interfaceSounds.id!,
           keepAlive: true);
       soundManager.handleEvent(soundEvent);
-      final sound = soundManager.getSound(soundEvent.id);
+      final sound = soundManager.getSound(soundEvent.id!);
       expect(sound, isA<BufferGenerator>());
     });
   });
