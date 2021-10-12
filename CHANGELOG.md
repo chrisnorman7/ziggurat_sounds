@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.5]
+
+### Added
+
+* Implement the `SetSoundChannelReverb` event.
+
 ## [0.6.4]
 
 ### Changed

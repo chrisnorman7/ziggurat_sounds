@@ -140,11 +140,14 @@ class SoundManager {
       }
       source.gain = event.gain;
       final reverbId = event.reverb;
+      final Reverb? reverb;
       if (reverbId != null) {
-        final reverb = getReverb(reverbId);
+        reverb = getReverb(reverbId);
         context.ConfigRoute(source, reverb.reverb);
+      } else {
+        reverb = null;
       }
-      _channels[event.id!] = AudioChannel(event.id!, source);
+      _channels[event.id!] = AudioChannel(event.id!, source, reverb);
     } else if (event is SetSoundChannelGain) {
       getChannel(event.id!).source.gain = event.gain;
     } else if (event is SetSoundChannelPosition) {
@@ -220,6 +223,17 @@ class SoundManager {
     } else if (event is SoundChannelFilter) {
       getChannel(event.id!).source.filter =
           BiquadConfig.designIdentity(context.synthizer);
+    } else if (event is SetSoundChannelReverb) {
+      final reverbId = event.reverb;
+      final channel = getChannel(event.id!);
+      final oldReverb = channel.reverb;
+      if (oldReverb != null) {
+        context.removeRoute(channel.source, oldReverb.reverb);
+      }
+      if (reverbId != null) {
+        final reverb = getReverb(reverbId);
+        context.ConfigRoute(channel.source, reverb.reverb);
+      }
     } else if (event is AutomationFade) {
       final sound = getSound(event.id!);
       context.executeAutomation(sound, [
