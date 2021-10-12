@@ -237,17 +237,20 @@ class SoundManager {
     } else if (event is AutomationFade) {
       final sound = getSound(event.id!);
       context.executeAutomation(sound, [
-        AutomationAppendPropertyCommand(game.runDurationSeconds + event.preFade,
-            Properties.gain, event.startGain),
         AutomationAppendPropertyCommand(
-            game.runDurationSeconds + event.fadeLength,
+            context.suggestedAutomationTime + event.preFade,
+            Properties.gain,
+            event.startGain),
+        AutomationAppendPropertyCommand(
+            context.suggestedAutomationTime + event.fadeLength,
             Properties.gain,
             event.endGain)
       ]).destroy();
     } else if (event is CancelAutomationFade) {
       final sound = getSound(event.id!);
       context.executeAutomation(sound, [
-        AutomationClearPropertyCommand(game.runDurationSeconds, Properties.gain)
+        AutomationClearPropertyCommand(
+            context.suggestedAutomationTime, Properties.gain)
       ]);
     } else if (event is SetDefaultPannerStrategy) {
       final PannerStrategy strategy;

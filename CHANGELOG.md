@@ -6,6 +6,10 @@
 
 * Implement the `SetSoundChannelReverb` event.
 
+### Changed
+
+* Start using `suggestedAutomationTime` for more accurate fades.
+
 ## [0.6.4]
 
 ### Changed
