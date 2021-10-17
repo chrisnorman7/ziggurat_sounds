@@ -63,7 +63,7 @@ void main() {
               value is Reverb &&
               value.name == preset.name &&
               value.reverb is GlobalFdnReverb));
-      expect(reverb.reverb.gain, equals(preset.gain));
+      expect(reverb.reverb.gain.value, equals(preset.gain));
       reverbEvent.destroy();
       await Future<void>.delayed(Duration.zero);
       expect(() => soundManager.getReverb(reverbEvent.id!),
@@ -84,19 +84,19 @@ void main() {
       expect(channel.sounds, isEmpty);
       var source = channel.source;
       expect(source, isA<DirectSource>());
-      expect(source.gain, equals(0.70));
+      expect(source.gain.value, equals(0.70));
       channelEvent.gain *= 2;
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(source.gain, equals(1.4));
+      expect(source.gain.value, equals(1.4));
       channelEvent = game.createSoundChannel(position: SoundPositionScalar());
       await Future<void>.delayed(Duration(milliseconds: 200));
       channel = soundManager.getChannel(channelEvent.id!);
       source = channel.source;
       if (source is ScalarPannedSource) {
-        expect(source.panningScalar, isZero);
+        expect(source.panningScalar.value, isZero);
         channelEvent.position = SoundPositionScalar(scalar: -1.0);
         await Future<void>.delayed(Duration(milliseconds: 200));
-        expect(source.panningScalar, equals(-1.0));
+        expect(source.panningScalar.value, equals(-1.0));
       } else {
         throw Exception('Source is not `ScalarPannedSource`.');
       }
@@ -105,15 +105,15 @@ void main() {
       channel = soundManager.getChannel(channelEvent.id!);
       source = channel.source;
       if (source is AngularPannedSource) {
-        expect(source.azimuth, isZero);
-        expect(source.elevation, isZero);
-        expect(source.gain, equals(channelEvent.gain));
+        expect(source.azimuth.value, isZero);
+        expect(source.elevation.value, isZero);
+        expect(source.gain.value, equals(channelEvent.gain));
         channelEvent.position =
             SoundPositionAngular(azimuth: 90.0, elevation: 45.0);
         await Future<void>.delayed(Duration(milliseconds: 200));
-        expect(source.azimuth, equals(90.0));
-        expect(source.elevation, equals(45.0));
-        expect(source.gain, equals(channelEvent.gain));
+        expect(source.azimuth.value, equals(90.0));
+        expect(source.elevation.value, equals(45.0));
+        expect(source.gain.value, equals(channelEvent.gain));
       } else {
         throw Exception('Source is not `AngularPannedSource`.');
       }
@@ -162,13 +162,13 @@ void main() {
       source = channel.source;
       if (source is Source3D) {
         final position = source.position;
-        expect(position.x, isZero);
-        expect(position.y, isZero);
-        expect(position.z, isZero);
+        expect(position.value.x, isZero);
+        expect(position.value.y, isZero);
+        expect(position.value.z, isZero);
         channelEvent.position = SoundPosition3d(x: 1.0, y: 2.0, z: 3.0);
         await Future<void>.delayed(Duration(milliseconds: 200));
-        expect(source.position, equals(Double3(1.0, 2.0, 3.0)));
-        expect(source.gain, equals(channelEvent.gain));
+        expect(source.position.value, equals(Double3(1.0, 2.0, 3.0)));
+        expect(source.gain.value, equals(channelEvent.gain));
       } else {
         throw Exception('Source is not of type `Source3D`.');
       }
@@ -195,27 +195,27 @@ void main() {
       expect(generator, isA<BufferGenerator>());
       expect(soundManager.getSound(sound.id!), isA<BufferGenerator>());
       // We know it is, but now Dart does too.
-      expect(generator.gain, equals(sound.gain));
+      expect(generator.gain.value, equals(sound.gain));
       sound.looping = true;
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(generator.looping, isTrue);
+      expect(generator.looping.value, isTrue);
       sound.looping = false;
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(generator.looping, isFalse);
+      expect(generator.looping.value, isFalse);
       sound.gain = 1.5;
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(generator.gain, equals(1.5));
+      expect(generator.gain.value, equals(1.5));
       sound.gain = 1.0;
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(generator.gain, equals(1.0));
+      expect(generator.gain.value, equals(1.0));
       final fade = sound.fade(length: 1.0, startGain: 1.0);
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(generator.gain, lessThan(1.0));
+      expect(generator.gain.value, lessThan(1.0));
       fade.cancel();
       await Future<void>.delayed(Duration(milliseconds: 200));
-      final gain = generator.gain;
+      final gain = generator.gain.value;
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(generator.gain, equals(gain));
+      expect(generator.gain.value, equals(gain));
       sound.destroy();
       await Future<void>.delayed(Duration.zero);
       expect(channelObject.sounds[sound.id], isNull);
@@ -225,49 +225,51 @@ void main() {
       await Future<void>.delayed(Duration(milliseconds: 200));
       expect(
           channelObject.sounds[sound.id],
-          predicate(
-              (value) => value is BufferGenerator && value.looping == true));
+          predicate((value) =>
+              value is BufferGenerator && value.looping.value == true));
     });
   });
   group('Global settings', () {
     test('set default panner strategy', () async {
-      expect(context.defaultPannerStrategy, equals(PannerStrategy.stereo));
+      expect(
+          context.defaultPannerStrategy.value, equals(PannerStrategy.stereo));
       game.setDefaultPannerStrategy(DefaultPannerStrategy.hrtf);
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(context.defaultPannerStrategy, equals(PannerStrategy.hrtf));
+      expect(context.defaultPannerStrategy.value, equals(PannerStrategy.hrtf));
       game.setDefaultPannerStrategy(DefaultPannerStrategy.stereo);
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(context.defaultPannerStrategy, equals(PannerStrategy.stereo));
+      expect(
+          context.defaultPannerStrategy.value, equals(PannerStrategy.stereo));
     });
     test('Set listener position', () async {
       game.setListenerPosition(1.0, 2.0, 3.0);
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(context.position, equals(Double3(1.0, 2.0, 3.0)));
+      expect(context.position.value, equals(Double3(1.0, 2.0, 3.0)));
       game.setListenerPosition(10.0, 20.0, 30.0);
       await Future<void>.delayed(Duration(milliseconds: 200));
-      expect(context.position, equals(Double3(10.0, 20.0, 30.0)));
+      expect(context.position.value, equals(Double3(10.0, 20.0, 30.0)));
     });
     test('Set listener orientation', () async {
       var angle = 180.0;
       game.setListenerOrientation(angle);
       await Future<void>.delayed(Duration(milliseconds: 200));
       var orientation = context.orientation;
-      expect(orientation.x1, equals(sin(angle * pi / 180)));
-      expect(orientation.y1, equals(cos(angle * pi / 180.0)));
-      expect(orientation.z1, isZero);
-      expect(orientation.x2, isZero);
-      expect(orientation.y2, isZero);
-      expect(orientation.z2, equals(1));
+      expect(orientation.value.x1, equals(sin(angle * pi / 180)));
+      expect(orientation.value.y1, equals(cos(angle * pi / 180.0)));
+      expect(orientation.value.z1, isZero);
+      expect(orientation.value.x2, isZero);
+      expect(orientation.value.y2, isZero);
+      expect(orientation.value.z2, equals(1));
       angle = 90.0;
       game.setListenerOrientation(angle);
       await Future<void>.delayed(Duration(milliseconds: 200));
       orientation = context.orientation;
-      expect(orientation.x1, equals(sin(angle * pi / 180)));
-      expect(orientation.y1, equals(cos(angle * pi / 180.0)));
-      expect(orientation.z1, isZero);
-      expect(orientation.x2, isZero);
-      expect(orientation.y2, isZero);
-      expect(orientation.z2, equals(1));
+      expect(orientation.value.x1, equals(sin(angle * pi / 180)));
+      expect(orientation.value.y1, equals(cos(angle * pi / 180.0)));
+      expect(orientation.value.z1, isZero);
+      expect(orientation.value.x2, isZero);
+      expect(orientation.value.y2, isZero);
+      expect(orientation.value.z2, equals(1));
     });
   });
   group('SoundManager', () {

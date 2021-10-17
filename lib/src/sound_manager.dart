@@ -128,7 +128,7 @@ class SoundManager {
       final Source source;
       if (position is SoundPosition3d) {
         source = Source3D(context)
-          ..position = Double3(position.x, position.y, position.z);
+          ..position.value = Double3(position.x, position.y, position.z);
       } else if (position is SoundPositionScalar) {
         source =
             context.createScalarPannedSource(panningScalar: position.scalar);
@@ -138,7 +138,7 @@ class SoundManager {
       } else {
         source = DirectSource(context);
       }
-      source.gain = event.gain;
+      source.gain.value = event.gain;
       final reverbId = event.reverb;
       final Reverb? reverb;
       if (reverbId != null) {
@@ -149,19 +149,20 @@ class SoundManager {
       }
       _channels[event.id!] = AudioChannel(event.id!, source, reverb);
     } else if (event is SetSoundChannelGain) {
-      getChannel(event.id!).source.gain = event.gain;
+      getChannel(event.id!).source.gain.value = event.gain;
     } else if (event is SetSoundChannelPosition) {
       final channel = getChannel(event.id!);
       final position = event.position;
       if (position is SoundPosition3d) {
-        (channel.source as Source3D).position =
+        (channel.source as Source3D).position.value =
             Double3(position.x, position.y, position.z);
       } else if (position is SoundPositionScalar) {
-        (channel.source as ScalarPannedSource).panningScalar = position.scalar;
+        (channel.source as ScalarPannedSource).panningScalar.value =
+            position.scalar;
       } else if (position is SoundPositionAngular) {
         (channel.source as AngularPannedSource)
-          ..azimuth = position.azimuth
-          ..elevation = position.elevation;
+          ..azimuth.value = position.azimuth
+          ..elevation.value = position.elevation;
       } else {
         // Nothing to do.
       }
@@ -180,9 +181,9 @@ class SoundManager {
     } else if (event is PlaySound) {
       final channel = getChannel(event.channel);
       final generator = BufferGenerator(context)
-        ..looping = event.looping
-        ..gain = event.gain
-        ..setBuffer(getBuffer(event.sound));
+        ..looping.value = event.looping
+        ..gain.value = event.gain
+        ..buffer.value = getBuffer(event.sound);
       if (event.keepAlive) {
         channel.sounds[event.id!] = generator;
         _sounds[event.id!] = generator;
@@ -204,24 +205,24 @@ class SoundManager {
     } else if (event is UnpauseSound) {
       getSound(event.id!).play();
     } else if (event is SetLoop) {
-      getSound(event.id!).looping = event.looping;
+      getSound(event.id!).looping.value = event.looping;
     } else if (event is SetSoundGain) {
-      getSound(event.id!).gain = event.gain;
+      getSound(event.id!).gain.value = event.gain;
     } else if (event is SetSoundPitchBend) {
-      getSound(event.id!)..pitchBend = event.pitchBend;
+      getSound(event.id!)..pitchBend.value = event.pitchBend;
     } else if (event is SoundChannelHighpass) {
-      getChannel(event.id!).source.filter = BiquadConfig.designHighpass(
+      getChannel(event.id!).source.filter.value = BiquadConfig.designHighpass(
           context.synthizer, event.frequency,
           q: event.q);
     } else if (event is SoundChannelLowpass) {
-      getChannel(event.id!).source.filter = BiquadConfig.designLowpass(
+      getChannel(event.id!).source.filter.value = BiquadConfig.designLowpass(
           context.synthizer, event.frequency,
           q: event.q);
     } else if (event is SoundChannelBandpass) {
-      getChannel(event.id!).source.filter = BiquadConfig.designBandpass(
+      getChannel(event.id!).source.filter.value = BiquadConfig.designBandpass(
           context.synthizer, event.frequency, event.bandwidth);
     } else if (event is SoundChannelFilter) {
-      getChannel(event.id!).source.filter =
+      getChannel(event.id!).source.filter.value =
           BiquadConfig.designIdentity(context.synthizer);
     } else if (event is SetSoundChannelReverb) {
       final reverbId = event.reverb;
@@ -235,23 +236,14 @@ class SoundManager {
         context.ConfigRoute(channel.source, reverb.reverb);
       }
     } else if (event is AutomationFade) {
-      final sound = getSound(event.id!);
-      context.executeAutomation(sound, [
-        AutomationAppendPropertyCommand(
-            context.suggestedAutomationTime + event.preFade,
-            Properties.gain,
-            event.startGain),
-        AutomationAppendPropertyCommand(
-            context.suggestedAutomationTime + event.fadeLength,
-            Properties.gain,
-            event.endGain)
-      ]).destroy();
+      final timebase = context.suggestedAutomationTime.value;
+      getSound(event.id!).gain.automate(context,
+          startTime: timebase + event.preFade,
+          startValue: event.startGain,
+          endTime: timebase + event.fadeLength,
+          endValue: event.endGain);
     } else if (event is CancelAutomationFade) {
-      final sound = getSound(event.id!);
-      context.executeAutomation(sound, [
-        AutomationClearPropertyCommand(
-            context.suggestedAutomationTime, Properties.gain)
-      ]);
+      getSound(event.id!).gain.clear(context);
     } else if (event is SetDefaultPannerStrategy) {
       final PannerStrategy strategy;
       switch (event.strategy) {
@@ -262,11 +254,11 @@ class SoundManager {
           strategy = PannerStrategy.hrtf;
           break;
       }
-      context.defaultPannerStrategy = strategy;
+      context.defaultPannerStrategy.value = strategy;
     } else if (event is ListenerPositionEvent) {
-      context.position = Double3(event.x, event.y, event.z);
+      context.position.value = Double3(event.x, event.y, event.z);
     } else if (event is ListenerOrientationEvent) {
-      context.orientation =
+      context.orientation.value =
           Double6(event.x1, event.y1, event.z1, event.x2, event.y2, event.z2);
     } else {
       throw Exception('Cannot handle $event.');

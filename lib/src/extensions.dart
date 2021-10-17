@@ -8,17 +8,18 @@ extension MakeGlobalFdnReverb on ReverbPreset {
   /// Make a reverb object from this preset.
   GlobalFdnReverb makeReverb(Context context) {
     final r = GlobalFdnReverb(context)
-      ..meanFreePath = meanFreePath
-      ..t60 = t60
-      ..lateReflectionsLfRolloff = lateReflectionsLfRolloff
-      ..lateReflectionsLfReference = lateReflectionsLfReference
-      ..lateReflectionsHfRolloff = lateReflectionsHfRolloff
-      ..lateReflectionsHfReference = lateReflectionsHfReference
-      ..lateReflectionsDiffusion = lateReflectionsDiffusion
-      ..lateReflectionsModulationDepth = lateReflectionsModulationDepth
-      ..lateReflectionsModulationFrequency = lateReflectionsModulationFrequency
-      ..lateReflectionsDelay = lateReflectionsDelay
-      ..gain = gain;
+      ..meanFreePath.value = meanFreePath
+      ..t60.value = t60
+      ..lateReflectionsLfRolloff.value = lateReflectionsLfRolloff
+      ..lateReflectionsLfReference.value = lateReflectionsLfReference
+      ..lateReflectionsHfRolloff.value = lateReflectionsHfRolloff
+      ..lateReflectionsHfReference.value = lateReflectionsHfReference
+      ..lateReflectionsDiffusion.value = lateReflectionsDiffusion
+      ..lateReflectionsModulationDepth.value = lateReflectionsModulationDepth
+      ..lateReflectionsModulationFrequency.value =
+          lateReflectionsModulationFrequency
+      ..lateReflectionsDelay.value = lateReflectionsDelay
+      ..gain.value = gain;
     return r;
   }
 }

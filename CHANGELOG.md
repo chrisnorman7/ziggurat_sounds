@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.6]
+
+### Changed
+
+* Updated dart_synthizer.
+
 ## [0.6.5]
 
 ### Added
