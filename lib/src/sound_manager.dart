@@ -1,5 +1,6 @@
 /// Provides the [SoundManager] class.
 import 'package:dart_synthizer/dart_synthizer.dart';
+import 'package:ziggurat/sound.dart';
 import 'package:ziggurat/ziggurat.dart';
 
 import 'audio_channel.dart';

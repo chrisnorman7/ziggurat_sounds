@@ -1,6 +1,6 @@
 /// Provides the [Reverb] class.
 import 'package:dart_synthizer/dart_synthizer.dart';
-import 'package:ziggurat/ziggurat.dart';
+import 'package:ziggurat/sound.dart';
 
 /// A reverb object.
 class Reverb {

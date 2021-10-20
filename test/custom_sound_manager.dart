@@ -1,5 +1,6 @@
 /// Provides the [CustomSoundManager] class.
 import 'package:dart_synthizer/dart_synthizer.dart';
+import 'package:ziggurat/sound.dart';
 import 'package:ziggurat/ziggurat.dart';
 import 'package:ziggurat_sounds/ziggurat_sounds.dart';
 

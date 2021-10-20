@@ -1,6 +1,6 @@
 /// Provides various extensions used by this package.
 import 'package:dart_synthizer/dart_synthizer.dart';
-import 'package:ziggurat/ziggurat.dart';
+import 'package:ziggurat/sound.dart';
 
 /// An extension for creating a [GlobalFdnReverb] instance from a
 /// [ReverbPreset] instance.

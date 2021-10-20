@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.7]
+
+### Changed
+
+* Updated json_annotation.
+* Updated Ziggurat.
+
 ## [0.6.6]
 
 ### Changed
