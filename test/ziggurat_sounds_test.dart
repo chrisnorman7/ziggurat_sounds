@@ -58,12 +58,8 @@ void main() {
       expect(soundManager.events.length, equals(3));
       expect(soundManager.events.last, equals(reverbEvent));
       final reverb = soundManager.getReverb(SoundEvent.maxEventId);
-      expect(
-          reverb,
-          predicate((value) =>
-              value is Reverb &&
-              value.name == preset.name &&
-              value.reverb is GlobalFdnReverb));
+      expect(reverb,
+          predicate((value) => value is Reverb && value.name == preset.name));
       expect(reverb.reverb.gain.value, equals(preset.gain));
       reverbEvent.destroy();
       await Future<void>.delayed(Duration.zero);
