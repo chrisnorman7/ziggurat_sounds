@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.10]
+
+### Changed
+
+* Destroy sounds that should not be kept alive.
+
 ## [0.6.9]
 
 ### Changed
