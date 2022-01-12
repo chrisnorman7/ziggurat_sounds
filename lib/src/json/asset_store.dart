@@ -68,6 +68,11 @@ class AssetStore with DumpLoadMixin {
   /// The directory where assets will reside.
   Directory get directory => Directory(destination);
 
+  /// Get an absolute version of [directory], relative to [relativeTo].
+  Directory getAbsoluteDirectory(Directory relativeTo) => Directory(
+        path.join(relativeTo.path, destination),
+      );
+
   /// The comment at the top of the resulting dart file.
   final String? comment;
 
@@ -79,13 +84,22 @@ class AssetStore with DumpLoadMixin {
   Map<String, dynamic> toJson() => _$AssetStoreToJson(this);
 
   /// Get an unused filename.
-  String getNextFilename({String suffix = ''}) {
+  String getNextFilename({
+    String suffix = '',
+    Directory? relativeTo,
+  }) {
+    final Directory d;
+    if (relativeTo != null) {
+      d = getAbsoluteDirectory(relativeTo);
+    } else {
+      d = directory;
+    }
     var i = 0;
     while (true) {
-      final fname = '${destination}/$i$suffix';
+      final fname = path.join(d.path, '$i$suffix');
       if (File(fname).existsSync() == false &&
           Directory(fname).existsSync() == false) {
-        return fname;
+        return fname.replaceAll(r'\', '/');
       }
       i++;
     }
@@ -94,12 +108,25 @@ class AssetStore with DumpLoadMixin {
   /// Import a single file.
   ///
   /// This method will encrypt [source], and place it in [destination].
-  AssetReferenceReference importFile(
-      {required File source, required String variableName, String? comment}) {
-    if (directory.existsSync() == false) {
-      directory.createSync();
+  ///
+  /// If this asset store is located in a directory other than the current one,
+  /// use the [relativeTo] argument to ensure paths still work.
+  AssetReferenceReference importFile({
+    required File source,
+    required String variableName,
+    String? comment,
+    Directory? relativeTo,
+  }) {
+    final Directory d;
+    if (relativeTo != null) {
+      d = getAbsoluteDirectory(relativeTo);
+    } else {
+      d = directory;
     }
-    final fname = getNextFilename(suffix: '.encrypted');
+    if (d.existsSync() == false) {
+      d.createSync();
+    }
+    final fname = getNextFilename(suffix: '.encrypted', relativeTo: relativeTo);
     final encryptionKey = SecureRandom(32).base64;
     final key = Key.fromBase64(encryptionKey);
     final iv = IV.fromLength(16);
@@ -108,7 +135,10 @@ class AssetStore with DumpLoadMixin {
     File(fname).writeAsBytesSync(data);
     final reference = AssetReference.file(fname, encryptionKey: encryptionKey);
     final assetReferenceReference = AssetReferenceReference(
-        variableName: variableName, reference: reference, comment: comment);
+      variableName: variableName,
+      reference: reference,
+      comment: comment,
+    );
     assets.add(assetReferenceReference);
     return assetReferenceReference;
   }
@@ -117,26 +147,35 @@ class AssetStore with DumpLoadMixin {
   ///
   /// This method will copy an encrypted version of every file from [directory]
   /// to [destination].
-  AssetReferenceReference importDirectory(
-      {required Directory source,
-      required String variableName,
-      String? comment}) {
-    if (directory.existsSync() == false) {
-      directory.createSync();
+  ///
+  /// If this asset store is located in a directory other than the current one,
+  /// use the [relativeTo] argument to ensure paths still work.
+  AssetReferenceReference importDirectory({
+    required Directory source,
+    required String variableName,
+    String? comment,
+    Directory? relativeTo,
+  }) {
+    final Directory d;
+    if (relativeTo != null) {
+      d = getAbsoluteDirectory(relativeTo);
+    } else {
+      d = directory;
     }
-    final directoryName = getNextFilename();
+    if (d.existsSync() == false) {
+      d.createSync();
+    }
+    final directoryName = getNextFilename(relativeTo: relativeTo);
     Directory(directoryName).createSync();
     final encryptionKey = SecureRandom(32).base64;
     final key = Key.fromBase64(encryptionKey);
     final iv = IV.fromLength(16);
     final encrypter = Encrypter(AES(key));
-    for (final entity in source.listSync()) {
-      if (entity is File) {
-        final filename = path.basename(entity.path) + '.encrypted';
-        final data =
-            encrypter.encryptBytes(entity.readAsBytesSync(), iv: iv).bytes;
-        File(path.join(directoryName, filename)).writeAsBytesSync(data);
-      }
+    for (final entity in source.listSync().whereType<File>()) {
+      final filename = path.basename(entity.path) + '.encrypted';
+      final data =
+          encrypter.encryptBytes(entity.readAsBytesSync(), iv: iv).bytes;
+      File(path.join(directoryName, filename)).writeAsBytesSync(data);
     }
     final reference =
         AssetReference.collection(directoryName, encryptionKey: encryptionKey);
