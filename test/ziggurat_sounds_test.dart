@@ -623,6 +623,12 @@ void main() {
                   '/',
                 ),
           );
+          expect(
+            store.getNextFilename(
+              relativeTo: storesDirectory.absolute,
+            ),
+            '${storesDirectory.path}/${store.destination}/0',
+          );
           storesDirectory.deleteSync(recursive: true);
         },
       );

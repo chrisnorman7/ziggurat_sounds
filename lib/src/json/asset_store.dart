@@ -96,9 +96,12 @@ class AssetStore with DumpLoadMixin {
     }
     var i = 0;
     while (true) {
-      final fname = path.join(d.path, '$i$suffix');
+      var fname = path.join(d.path, '$i$suffix');
       if (File(fname).existsSync() == false &&
           Directory(fname).existsSync() == false) {
+        if (relativeTo != null) {
+          fname = path.relative(fname);
+        }
         return fname.replaceAll(r'\', '/');
       }
       i++;
