@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.13]
+
+### Fixed
+
+* Fixed relative filenames.
+
 ## [0.6.12]
 
 ### Added
