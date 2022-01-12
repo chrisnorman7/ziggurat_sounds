@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.12]
+
+### Added
+
+* Added a `relativeTo` argument to many of the `AssetStore` methods.
+
 ## [0.6.11]
 
 ### Changed
