@@ -207,7 +207,7 @@ class SoundManager {
       getSound(event.id!).pause();
     } else if (event is UnpauseSound) {
       getSound(event.id!).play();
-    } else if (event is SetLoop) {
+    } else if (event is SetSoundLooping) {
       getSound(event.id!).looping.value = event.looping;
     } else if (event is SetSoundGain) {
       getSound(event.id!).gain.value = event.gain;
