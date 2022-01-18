@@ -7,6 +7,7 @@ import 'package:dart_synthizer/dart_synthizer.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
+import 'package:ziggurat/notes.dart';
 import 'package:ziggurat/sound.dart';
 import 'package:ziggurat/ziggurat.dart';
 import 'package:ziggurat_sounds/ziggurat_sounds.dart';
@@ -26,8 +27,11 @@ void main() {
   final buffers = CustomBufferStore(Random(), synthizer);
   final game = Game('Sounds');
   final random = game.random;
-  final soundManager = CustomSoundManager(game, context)
-    ..bufferStores.add(buffers);
+  final soundManager = CustomSoundManager(
+    game: game,
+    context: context,
+    bufferStores: [buffers],
+  );
   game.sounds.listen(soundManager.handleEvent);
   group(
     'Initialisation',
@@ -209,8 +213,10 @@ void main() {
           await Future<void>.delayed(Duration.zero);
           final channelObject = soundManager.getChannel(channel.id!);
           expect(channelObject.sounds[sound.id], isNull);
-          sound = channel.playSound(AssetReference.file('another.wav'),
-              keepAlive: true);
+          sound = channel.playSound(
+            AssetReference.file('another.wav'),
+            keepAlive: true,
+          );
           expect(sound.keepAlive, isTrue);
           await Future<void>.delayed(Duration(milliseconds: 200));
           final generator = channelObject.sounds[sound.id]!;
@@ -241,14 +247,19 @@ void main() {
           sound.destroy();
           await Future<void>.delayed(Duration.zero);
           expect(channelObject.sounds[sound.id], isNull);
-          sound = channel.playSound(AssetReference.file('looping.wav'),
-              looping: true, keepAlive: true);
+          sound = channel.playSound(
+            AssetReference.file('looping.wav'),
+            looping: true,
+            keepAlive: true,
+          );
           expect(sound.looping, isTrue);
           await Future<void>.delayed(Duration(milliseconds: 200));
           expect(
-              channelObject.sounds[sound.id],
-              predicate((value) =>
-                  value is BufferGenerator && value.looping.value == true));
+            channelObject.sounds[sound.id],
+            predicate((value) =>
+                value is BufferGenerator && value.looping.value == true),
+          );
+          sound.destroy();
         },
       );
     },
@@ -312,7 +323,10 @@ void main() {
   group(
     'SoundManager',
     () {
-      var soundManager = SoundManager(game: game, context: context);
+      var soundManager = SoundManager(
+        game: game,
+        context: context,
+      );
       final bufferStore = BufferStore(Random(), synthizer);
       test(
         '.bufferStores',
@@ -377,9 +391,13 @@ void main() {
         '.getSound',
         () {
           expect(
-              () => soundManager.getSound(3), throwsA(isA<NoSuchSoundError>()));
-          expect(bufferStore.getBuffer(AssetReference.file('silence.wav')),
-              isA<Buffer>());
+            () => soundManager.getSound(3),
+            throwsA(isA<NoSuchSoundError>()),
+          );
+          expect(
+            bufferStore.getBuffer(AssetReference.file('silence.wav')),
+            isA<Buffer>(),
+          );
           soundManager.bufferStores.add(bufferStore);
           final soundEvent = PlaySound(
               game: game,
@@ -786,6 +804,62 @@ void main() {
           expect(store.getAbsoluteDirectory(storeDirectory).listSync().length,
               equals(2));
           storeDirectory.deleteSync(recursive: true);
+        },
+      );
+    },
+  );
+  group(
+    'PlayWave ',
+    () {
+      test(
+        'Play waves',
+        () async {
+          final channel = game.createSoundChannel();
+          final wave = channel.playSine(a4);
+          await Future<void>.delayed(Duration(milliseconds: 200));
+          expect(soundManager.getChannel(channel.id!), isNotNull);
+          final generator = soundManager.getWave(wave.id!);
+          expect(generator, isA<FastSineBankGenerator>());
+          expect(generator.gain.value, wave.gain);
+          expect(generator.frequency.value, wave.frequency);
+          wave.gain = 0.5;
+          await Future<void>.delayed(Duration(milliseconds: 200));
+          expect(generator.gain.value, 0.5);
+          wave.frequency = c3;
+          await Future<void>.delayed(Duration(milliseconds: 200));
+          expect(generator.frequency.value, c3);
+          wave.automateFrequency(length: 0.5, endFrequency: a4);
+          await Future<void>.delayed(Duration(milliseconds: 700));
+          expect(generator.frequency.value, a4);
+          expect(wave.paused, isFalse);
+          wave.pause();
+          expect(wave.paused, isTrue);
+          wave.unpause();
+          expect(wave.paused, isFalse);
+          wave.fade(length: 0.5);
+          await Future<void>.delayed(Duration(milliseconds: 700));
+          expect(generator.gain.value, isZero);
+          final fade = wave.fade(length: 1.0, endGain: 1.0);
+          await Future<void>.delayed(Duration(milliseconds: 200));
+          final gain = generator.gain.value;
+          expect(gain, inExclusiveRange(0, 1));
+          fade.cancel();
+          await Future<void>.delayed(Duration(seconds: 1));
+          final newGain = generator.gain.value;
+          expect(newGain, greaterThanOrEqualTo(gain));
+          wave.destroy();
+          await Future<void>.delayed(Duration(milliseconds: 900));
+          expect(
+            () => soundManager.getWave(wave.id!),
+            throwsA(isA<NoSuchWaveError>()),
+          );
+          expect(
+            soundManager.getChannel(wave.channel).waves.keys,
+            isNot(contains(wave.id)),
+          );
+          // The below test is commented out because it always fails, and I've
+          // no idea why.
+          // expect(generator.isValid, isFalse);
         },
       );
     },

@@ -8,6 +8,7 @@
     "ctx",
     "encrypter",
     "Fdn",
+    "ffi",
     "fname",
     "formals",
     "Highpass",

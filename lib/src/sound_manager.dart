@@ -1,6 +1,7 @@
 /// Provides the [SoundManager] class.
 import 'package:dart_synthizer/dart_synthizer.dart';
 import 'package:ziggurat/sound.dart';
+import 'package:ziggurat/wave_types.dart';
 import 'package:ziggurat/ziggurat.dart';
 
 import 'audio_channel.dart';
@@ -26,9 +27,10 @@ class SoundManager {
   SoundManager({
     required this.game,
     required this.context,
-    this.bufferStores = const [],
+    List<BufferStore>? bufferStores,
     this.bufferCache,
-  })  : _reverbs = {},
+  })  : bufferStores = bufferStores ?? [],
+        _reverbs = {},
         _channels = {},
         _sounds = {},
         _waves = {};
@@ -161,6 +163,10 @@ class SoundManager {
       handlePlaySound(event);
     } else if (event is DestroySound) {
       handleDestroySound(event);
+    } else if (event is PauseWave) {
+      handlePauseWave(event);
+    } else if (event is UnpauseWave) {
+      handleUnpauseWave(event);
     } else if (event is PauseSound) {
       handlePauseSound(event);
     } else if (event is UnpauseSound) {
@@ -191,6 +197,16 @@ class SoundManager {
       handleListenerPositionEvent(event);
     } else if (event is ListenerOrientationEvent) {
       handleListenerOrientationEvent(event);
+    } else if (event is PlayWave) {
+      handlePlayWave(event);
+    } else if (event is SetWaveGain) {
+      handleSetWaveGain(event);
+    } else if (event is SetWaveFrequency) {
+      handleSetWaveFrequency(event);
+    } else if (event is AutomateWaveFrequency) {
+      handleAutomateWaveFrequency(event);
+    } else if (event is DestroyWave) {
+      handleDestroyWave(event);
     } else {
       throw UnimplementedError('Cannot handle $event.');
     }
@@ -229,12 +245,13 @@ class SoundManager {
 
   /// Cancel a fade.
   void handleCancelAutomationFade(CancelAutomationFade event) {
+    final id = event.id!;
     switch (event.fadeType) {
       case FadeType.sound:
-        getSound(event.id!).gain.clear(context);
+        getSound(id).gain.clear(context);
         break;
       case FadeType.wave:
-        getWave(event.id!).gain.clear(context);
+        getWave(id).gain.clear(context);
         break;
     }
   }
@@ -436,5 +453,88 @@ class SoundManager {
       reverb = null;
     }
     _channels[event.id!] = AudioChannel(event.id!, source, reverb);
+  }
+
+  /// Play a wave.
+  void handlePlayWave(PlayWave event) {
+    final channel = getChannel(event.channel);
+    final FastSineBankGenerator generator;
+    switch (event.waveType) {
+      case WaveType.sine:
+        generator = FastSineBankGenerator.sine(context, event.frequency);
+        break;
+      case WaveType.triangle:
+        generator = FastSineBankGenerator.triangle(
+          context,
+          event.frequency,
+          event.partials,
+        );
+        break;
+      case WaveType.square:
+        generator = FastSineBankGenerator.square(
+          context,
+          event.frequency,
+          event.partials,
+        );
+        break;
+      case WaveType.saw:
+        generator = FastSineBankGenerator.saw(
+          context,
+          event.frequency,
+          event.partials,
+        );
+        break;
+    }
+    generator.gain.value = event.gain;
+    final id = event.id!;
+    channel
+      ..source.addGenerator(generator)
+      ..waves[id] = generator;
+    _waves[id] = generator;
+  }
+
+  /// Set the gain for a wave.
+  void handleSetWaveGain(SetWaveGain event) {
+    getWave(event.id!).gain.value = event.gain;
+  }
+
+  /// Set the frequency of a wave.
+  void handleSetWaveFrequency(SetWaveFrequency event) {
+    getWave(event.id!).frequency.value = event.frequency;
+  }
+
+  /// Automate the frequency of a wave.
+  void handleAutomateWaveFrequency(AutomateWaveFrequency event) {
+    final timebase = context.suggestedAutomationTime.value;
+    getWave(event.id!).frequency.automate(
+          context,
+          startTime: timebase,
+          startValue: event.startFrequency,
+          endTime: timebase + event.length,
+          endValue: event.endFrequency,
+        );
+  }
+
+  /// Pause a wave.
+  void handlePauseWave(PauseWave event) {
+    getWave(event.id!).pause();
+  }
+
+  /// Unpause a wave.
+  void handleUnpauseWave(UnpauseWave event) {
+    getWave(event.id!).play();
+  }
+
+  /// Destroy a wave.
+  void handleDestroyWave(DestroyWave event) {
+    final id = event.id!;
+    final generator = _waves.remove(id);
+    if (generator == null) {
+      throw NoSuchWaveError(id);
+    }
+    for (final channel in _channels.values) {
+      channel.waves.remove(id);
+    }
+    generator.destroy();
   }
 }

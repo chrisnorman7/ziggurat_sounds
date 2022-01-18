@@ -2,6 +2,10 @@
 
 ## [0.9.0]
 
+### Added
+
+* Start supporting waves.
+
 ### Changed
 
 * Converted the constructor of `SoundManager` to use only named parameters.

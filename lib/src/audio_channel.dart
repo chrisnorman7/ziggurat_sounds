@@ -6,7 +6,9 @@ import 'reverb.dart';
 /// A channel to play sounds through.
 class AudioChannel {
   /// Create the channel.
-  AudioChannel(this.id, this.source, this.reverb) : sounds = {};
+  AudioChannel(this.id, this.source, this.reverb)
+      : sounds = {},
+        waves = {};
 
   /// The id of this channel.
   final int id;
@@ -19,6 +21,9 @@ class AudioChannel {
 
   /// The sounds that are playing through this channel.
   final Map<int, BufferGenerator> sounds;
+
+  /// The waves that are playing through this channel.
+  final Map<int, FastSineBankGenerator> waves;
 
   /// Destroy this channel.
   void destroy() => source.destroy();
