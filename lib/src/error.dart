@@ -72,3 +72,15 @@ class NoSuchSoundError extends ZigguratSoundsError {
   @override
   String toString() => 'No sound found with ID $id.';
 }
+
+/// No such wave was found.
+class NoSuchWaveError extends ZigguratSoundsError {
+  /// Create an instance.
+  NoSuchWaveError(this.id);
+
+  /// The ID of the wave.
+  final int id;
+
+  @override
+  String toString() => 'No wave found with ID $id.';
+}
