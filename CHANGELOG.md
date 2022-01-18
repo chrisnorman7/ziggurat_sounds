@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.9.0]
+
+### Changed
+
+* Converted the constructor of `SoundManager` to use only named parameters.
+
 ## [0.8.0]
 
 ### Changed

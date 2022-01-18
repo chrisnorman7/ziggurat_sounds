@@ -312,7 +312,7 @@ void main() {
   group(
     'SoundManager',
     () {
-      var soundManager = SoundManager(game, context);
+      var soundManager = SoundManager(game: game, context: context);
       final bufferStore = BufferStore(Random(), synthizer);
       test(
         '.bufferStores',
@@ -335,8 +335,8 @@ void main() {
           expect(soundManager.getBuffer(AssetReference.file('silence.wav')),
               isA<Buffer>());
           soundManager = SoundManager(
-            game,
-            context,
+            game: game,
+            context: context,
             bufferCache: BufferCache(
                 synthizer: synthizer,
                 maxSize: pow(1024, 3).floor(),

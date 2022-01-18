@@ -9,7 +9,7 @@ class CustomSoundManager extends SoundManager {
   /// Create an instance.
   CustomSoundManager(Game game, Context context)
       : events = [],
-        super(game, context);
+        super(game: game, context: context);
 
   /// All the events that have been processed.
   final List<SoundEvent> events;

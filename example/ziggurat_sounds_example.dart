@@ -18,7 +18,8 @@ Future<void> main() async {
   await bufferStore.addFile(File('shot.wav'));
   print('Added shot.wav.');
   final game = Game('Sounds Example');
-  final soundManager = SoundManager(game, ctx)..bufferStores.add(bufferStore);
+  final soundManager = SoundManager(game: game, context: ctx)
+    ..bufferStores.add(bufferStore);
   print('Created a sound manager.');
   game.sounds.listen(soundManager.handleEvent);
   print(
