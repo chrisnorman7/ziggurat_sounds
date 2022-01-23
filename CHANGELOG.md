@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.10.0]
+
+### Fixed
+
+* Fixed some bugs relating to importing with relative paths.
+
 ## [0.9.0]
 
 ### Added
