@@ -100,7 +100,7 @@ class AssetStore with DumpLoadMixin {
       if (File(fname).existsSync() == false &&
           Directory(fname).existsSync() == false) {
         if (relativeTo != null) {
-          fname = path.relative(fname);
+          fname = path.relative(fname, from: relativeTo.path);
         }
         return fname.replaceAll(r'\', '/');
       }
@@ -135,7 +135,11 @@ class AssetStore with DumpLoadMixin {
     final iv = IV.fromLength(16);
     final encrypter = Encrypter(AES(key));
     final data = encrypter.encryptBytes(source.readAsBytesSync(), iv: iv).bytes;
-    File(fname).writeAsBytesSync(data);
+    var filename = fname;
+    if (relativeTo != null) {
+      filename = path.join(relativeTo.path, filename);
+    }
+    File(filename).writeAsBytesSync(data);
     final reference = AssetReference.file(fname, encryptionKey: encryptionKey);
     final assetReferenceReference = AssetReferenceReference(
       variableName: variableName,
@@ -169,7 +173,11 @@ class AssetStore with DumpLoadMixin {
       d.createSync();
     }
     final directoryName = getNextFilename(relativeTo: relativeTo);
-    Directory(directoryName).createSync();
+    var absoluteDirectoryName = directoryName;
+    if (relativeTo != null) {
+      absoluteDirectoryName = path.join(relativeTo.path, absoluteDirectoryName);
+    }
+    Directory(absoluteDirectoryName).createSync();
     final encryptionKey = SecureRandom(32).base64;
     final key = Key.fromBase64(encryptionKey);
     final iv = IV.fromLength(16);
@@ -178,12 +186,17 @@ class AssetStore with DumpLoadMixin {
       final filename = path.basename(entity.path) + '.encrypted';
       final data =
           encrypter.encryptBytes(entity.readAsBytesSync(), iv: iv).bytes;
-      File(path.join(directoryName, filename)).writeAsBytesSync(data);
+      File(path.join(absoluteDirectoryName, filename)).writeAsBytesSync(data);
     }
-    final reference =
-        AssetReference.collection(directoryName, encryptionKey: encryptionKey);
+    final reference = AssetReference.collection(
+      directoryName,
+      encryptionKey: encryptionKey,
+    );
     final assetReferenceReference = AssetReferenceReference(
-        variableName: variableName, reference: reference, comment: comment);
+      variableName: variableName,
+      reference: reference,
+      comment: comment,
+    );
     assets.add(assetReferenceReference);
     return assetReferenceReference;
   }

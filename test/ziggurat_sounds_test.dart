@@ -632,7 +632,6 @@ void main() {
             ),
             path
                 .join(
-                  storesDirectory.path,
                   store.destination,
                   '0.encrypted',
                 )
@@ -645,7 +644,7 @@ void main() {
             store.getNextFilename(
               relativeTo: storesDirectory.absolute,
             ),
-            '${storesDirectory.path}/${store.destination}/0',
+            '${store.destination}/0',
           );
           storesDirectory.deleteSync(recursive: true);
         },
