@@ -69,7 +69,7 @@ void main() {
       test(
         'Reverb',
         () async {
-          final preset = ReverbPreset('Test Reverb');
+          final preset = ReverbPreset(name: 'Test Reverb');
           expect(preset.gain, equals(0.5));
           final reverbEvent = game.createReverb(preset);
           expect(reverbEvent.reverb, equals(preset));
@@ -380,7 +380,7 @@ void main() {
           expect(() => soundManager.getReverb(2),
               throwsA(isA<NoSuchReverbError>()));
           soundManager.handleEvent(CreateReverb(
-              game: game, id: 2, reverb: ReverbPreset('Test Reverb')));
+              game: game, id: 2, reverb: ReverbPreset(name: 'Test Reverb')));
           final reverb = soundManager.getReverb(2);
           expect(reverb, isA<Reverb>());
           expect(reverb.name, equals('Test Reverb'));
