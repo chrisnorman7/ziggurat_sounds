@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.12.0]
+
+### Changed
+
+* Both `AssetStore` and `AssetReferenceReference` now have constant constructors.
+
 ## [0.11.0]
 
 ### Changed
