@@ -1,4 +1,4 @@
-/// Provides classes relating to assets.
+/// Provides classes relating to asset stores.
 import 'dart:convert';
 import 'dart:io';
 
@@ -16,8 +16,11 @@ part 'asset_store.g.dart';
 @JsonSerializable()
 class AssetReferenceReference {
   /// Create an instance.
-  AssetReferenceReference(
-      {required this.variableName, required this.reference, this.comment});
+  const AssetReferenceReference({
+    required this.variableName,
+    required this.reference,
+    this.comment,
+  });
 
   /// Create an instance from a JSON object.
   factory AssetReferenceReference.fromJson(Map<String, dynamic> json) =>
@@ -38,16 +41,16 @@ class AssetReferenceReference {
   Map<String, dynamic> toJson() => _$AssetReferenceReferenceToJson(this);
 }
 
-/// A class for storing references to encrypted assets.
+/// A class for storing references to assets.
 @JsonSerializable()
 class AssetStore with DumpLoadMixin {
   /// Create an instance.
-  AssetStore(
-      {required this.filename,
-      required this.destination,
-      this.comment,
-      List<AssetReferenceReference>? assets})
-      : assets = assets ?? [];
+  const AssetStore({
+    required this.filename,
+    required this.destination,
+    required this.assets,
+    this.comment,
+  });
 
   /// Create an instance from a JSON object.
   factory AssetStore.fromJson(Map<String, dynamic> json) =>

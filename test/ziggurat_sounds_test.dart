@@ -561,15 +561,21 @@ void main() {
       test(
         'Initialise',
         () {
-          var store = AssetStore(filename: 'test.dart', destination: 'assets');
+          var store = AssetStore(
+            filename: 'test.dart',
+            destination: 'assets',
+            assets: [],
+          );
           expect(store.filename, equals('test.dart'));
           expect(store.destination, equals('assets'));
           expect(store.comment, isNull);
           expect(store.assets, isEmpty);
           store = AssetStore(
-              filename: store.filename,
-              destination: store.destination,
-              comment: 'Testing.');
+            filename: store.filename,
+            destination: store.destination,
+            assets: [],
+            comment: 'Testing.',
+          );
           expect(store.filename, equals('test.dart'));
           expect(store.destination, equals('assets'));
           expect(store.assets, isEmpty);
@@ -597,6 +603,7 @@ void main() {
           final store = AssetStore(
             filename: 'test.dart',
             destination: 'assets',
+            assets: [],
           );
           if (store.directory.existsSync()) {
             store.directory.deleteSync(recursive: true);
@@ -620,6 +627,7 @@ void main() {
           final store = AssetStore(
             filename: 'store.dart',
             destination: 'first',
+            assets: [],
           );
           expect(
             store.directory.existsSync(),
@@ -656,6 +664,7 @@ void main() {
           final store = AssetStore(
             filename: 'test.dart',
             destination: 'lovely_store',
+            assets: [],
           );
           expect(store.directory.path, store.destination);
           expect(
@@ -670,8 +679,11 @@ void main() {
       test(
         '.importFile',
         () {
-          final store =
-              AssetStore(filename: 'test.dart', destination: 'test.importFile');
+          final store = AssetStore(
+            filename: 'test.dart',
+            destination: 'test.importFile',
+            assets: [],
+          );
           if (store.directory.existsSync()) {
             store.directory.deleteSync(recursive: true);
           }
@@ -708,7 +720,10 @@ void main() {
         () {
           final testDirectory = Directory('test');
           final store = AssetStore(
-              filename: 'test.dart', destination: 'test.importDirectory');
+            filename: 'test.dart',
+            destination: 'test.importDirectory',
+            assets: [],
+          );
           if (store.directory.existsSync()) {
             store.directory.deleteSync(recursive: true);
           }
@@ -750,6 +765,7 @@ void main() {
           final store = AssetStore(
             filename: 'test.dart',
             destination: 'assets',
+            assets: [],
           );
           if (store.directory.existsSync()) {
             store.directory.deleteSync(recursive: true);
@@ -776,6 +792,7 @@ void main() {
           final store = AssetStore(
             filename: 'test.dart',
             destination: 'lovely_store',
+            assets: [],
           );
           expect(
             store.getAbsoluteDirectory(storeDirectory).path,
