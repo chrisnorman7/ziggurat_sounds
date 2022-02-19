@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.14.0]
+
+### Changed
+
+* Upgrade ziggurat.
+
 ## [0.13.0]
 
 ### Changed
