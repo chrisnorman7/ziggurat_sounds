@@ -452,7 +452,8 @@ class SoundManager {
     } else {
       reverb = null;
     }
-    _channels[event.id!] = AudioChannel(event.id!, source, reverb);
+    final soundChannelId = event.id!;
+    _channels[soundChannelId] = AudioChannel(soundChannelId, source, reverb);
   }
 
   /// Play a wave.
