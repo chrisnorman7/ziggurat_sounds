@@ -6,6 +6,7 @@
 
 * Changed the constructor for the `Reverb` class.
 * Made the `Reverb` class require an `id` argument.
+* Upgraded ziggurat.
 
 ## [0.14.0]
 
