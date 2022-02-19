@@ -5,7 +5,14 @@ import 'package:ziggurat/sound.dart';
 /// A reverb object.
 class Reverb {
   /// Create an instance.
-  Reverb(this.name, this.reverb);
+  const Reverb({
+    required this.id,
+    required this.name,
+    required this.reverb,
+  });
+
+  /// The ID of the event that generated this instance.
+  final int id;
 
   /// The name of the reverb preset that was used to create this instance.
   final String name;
