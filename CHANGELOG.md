@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.16.0]
+
+### Changed
+
+* Don't perform any checks before setting sound channel reverb.
+
 ## [0.15.0]
 
 ### Changed

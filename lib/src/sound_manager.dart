@@ -283,10 +283,6 @@ class SoundManager {
     final reverbId = event.reverb;
     final channel = getChannel(event.id!);
     final oldReverb = channel.reverb;
-    if (oldReverb?.id == reverbId) {
-      // No need to set the same reverb twice.
-      return;
-    }
     if (oldReverb != null) {
       context.removeRoute(channel.source, oldReverb.reverb);
     }
