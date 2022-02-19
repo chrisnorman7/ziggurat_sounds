@@ -57,8 +57,10 @@ void main() {
           expect(soundManager.events.last, equals(game.ambianceSounds));
           expect(soundManager.getChannel(1), isA<AudioChannel>());
           expect(soundManager.getChannel(2), isA<AudioChannel>());
-          expect(() => soundManager.getReverb(0),
-              throwsA(isA<NoSuchReverbError>()));
+          expect(
+            () => soundManager.getReverb(0),
+            throwsA(isA<NoSuchReverbError>()),
+          );
         },
       );
     },
@@ -122,8 +124,9 @@ void main() {
           } else {
             throw Exception('Source is not `ScalarPannedSource`.');
           }
-          channelEvent =
-              game.createSoundChannel(position: SoundPositionAngular());
+          channelEvent = game.createSoundChannel(
+            position: SoundPositionAngular(),
+          );
           await Future<void>.delayed(Duration(milliseconds: 200));
           channel = soundManager.getChannel(channelEvent.id!);
           source = channel.source;
@@ -377,10 +380,14 @@ void main() {
       test(
         '.getReverb',
         () {
-          expect(() => soundManager.getReverb(2),
-              throwsA(isA<NoSuchReverbError>()));
-          soundManager.handleEvent(CreateReverb(
-              game: game, id: 2, reverb: ReverbPreset(name: 'Test Reverb')));
+          expect(
+            () => soundManager.getReverb(2),
+            throwsA(isA<NoSuchReverbError>()),
+          );
+          soundManager.handleEvent(
+            CreateReverb(
+                game: game, id: 2, reverb: ReverbPreset(name: 'Test Reverb')),
+          );
           final reverb = soundManager.getReverb(2);
           expect(reverb, isA<Reverb>());
           expect(reverb.name, equals('Test Reverb'));
@@ -407,6 +414,44 @@ void main() {
           soundManager.handleEvent(soundEvent);
           final sound = soundManager.getSound(soundEvent.id!);
           expect(sound, isA<BufferGenerator>());
+        },
+      );
+      test(
+        'Toggling Reverbs',
+        () async {
+          final game = Game('Replacement Game');
+          final soundManager = CustomSoundManager(
+            game: game,
+            context: context,
+            bufferStores: [],
+          );
+          game.sounds.listen(soundManager.handleEvent);
+          final channel = game.createSoundChannel();
+          final reverb = game.createReverb(ReverbPreset(name: 'Test Reverb'));
+          expect(channel.reverb, isNull);
+          await Future<void>.delayed(Duration(milliseconds: 200));
+          expect(soundManager.events.length, 4);
+          final source = soundManager.getChannel(channel.id!);
+          expect(source.reverb, isNull);
+          expect(soundManager.getChannel(channel.id!), source);
+          expect(source.id, channel.id);
+          expect(soundManager.getReverb(reverb.id!), isNotNull);
+          await Future<void>.delayed(Duration(milliseconds: 20));
+          channel.reverb = reverb.id!;
+          await Future<void>.delayed(Duration(milliseconds: 200));
+          expect(
+            source.reverb,
+            predicate(
+              (value) => value is Reverb && value.id == reverb.id,
+            ),
+          );
+          channel.reverb = null;
+          await Future<void>.delayed(Duration(milliseconds: 50));
+          expect(source.reverb, isNull);
+          final reverb2 = game.createReverb(ReverbPreset(name: 'Preset 2'));
+          channel.reverb = reverb2.id!;
+          await Future<void>.delayed(Duration(milliseconds: 200));
+          expect(source.reverb?.id, reverb2.id);
         },
       );
     },
@@ -825,7 +870,7 @@ void main() {
     },
   );
   group(
-    'PlayWave ',
+    'PlayWave',
     () {
       test(
         'Play waves',
@@ -873,8 +918,9 @@ void main() {
             soundManager.getChannel(wave.channel).waves.keys,
             isNot(contains(wave.id)),
           );
-          // The below test is commented out because it always fails, and I've
-          // no idea why.
+          // The below test is commented out because it always fails, presumably
+          //something to do with ffi.
+          // expect(generator.handle.value, isZero);
           // expect(generator.isValid, isFalse);
         },
       );
