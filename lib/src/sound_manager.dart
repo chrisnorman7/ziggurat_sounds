@@ -288,7 +288,10 @@ class SoundManager {
     }
     if (reverbId != null) {
       final reverb = getReverb(reverbId);
+      channel.reverb = reverb;
       context.ConfigRoute(channel.source, reverb.reverb);
+    } else {
+      channel.reverb = null;
     }
   }
 
