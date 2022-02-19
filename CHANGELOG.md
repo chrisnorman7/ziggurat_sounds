@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.0]
+
+### Changed
+
+* Changed the constructor for the `Reverb` class.
+* Made the `Reverb` class require an `id` argument.
+
 ## [0.14.0]
 
 ### Changed
