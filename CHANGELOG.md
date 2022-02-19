@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.17.0]
+
+### Fixed
+
+* Fixed a reverb bug where channel reverbs weren't being remembered.
+
 ## [0.16.0]
 
 ### Changed
