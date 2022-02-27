@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.18.2]
+
+### Changed
+
+* Downgraded path.
+
 ## [0.18.1]
 
 ### Changed
