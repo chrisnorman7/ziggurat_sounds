@@ -43,7 +43,7 @@ void main() {
           final events = <SoundEvent>[];
           game.sounds.listen(events.add);
           await Future<void>.delayed(Duration.zero);
-          expect(events.length, equals(2));
+          expect(events.length, 3);
           expect(events.first, isA<SoundChannel>());
           expect(events.last, isA<SoundChannel>());
         },
@@ -52,9 +52,10 @@ void main() {
         'Game Initialisation',
         () async {
           expect(game.soundsController.hasListener, isTrue);
-          expect(soundManager.events.length, equals(2));
-          expect(soundManager.events.first, equals(game.interfaceSounds));
-          expect(soundManager.events.last, equals(game.ambianceSounds));
+          expect(soundManager.events.length, 3);
+          expect(soundManager.events.first, game.interfaceSounds);
+          expect(soundManager.events[1], game.ambianceSounds);
+          expect(soundManager.events.last, game.musicSounds);
           expect(soundManager.getChannel(1), isA<AudioChannel>());
           expect(soundManager.getChannel(2), isA<AudioChannel>());
           expect(
@@ -76,7 +77,7 @@ void main() {
           final reverbEvent = game.createReverb(preset);
           expect(reverbEvent.reverb, equals(preset));
           await Future<void>.delayed(Duration(milliseconds: 100));
-          expect(soundManager.events.length, equals(3));
+          expect(soundManager.events.length, 4);
           expect(soundManager.events.last, equals(reverbEvent));
           final reverb = soundManager.getReverb(SoundEvent.maxEventId);
           expect(
@@ -88,7 +89,7 @@ void main() {
           await Future<void>.delayed(Duration.zero);
           expect(() => soundManager.getReverb(reverbEvent.id!),
               throwsA(isA<NoSuchReverbError>()));
-          expect(soundManager.events.length, equals(4));
+          expect(soundManager.events.length, 5);
           expect(
               soundManager.events.last,
               predicate((value) =>
@@ -430,7 +431,7 @@ void main() {
           final reverb = game.createReverb(ReverbPreset(name: 'Test Reverb'));
           expect(channel.reverb, isNull);
           await Future<void>.delayed(Duration(milliseconds: 200));
-          expect(soundManager.events.length, 4);
+          expect(soundManager.events.length, 5);
           final source = soundManager.getChannel(channel.id!);
           expect(source.reverb, isNull);
           expect(soundManager.getChannel(channel.id!), source);
