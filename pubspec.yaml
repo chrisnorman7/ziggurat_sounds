@@ -1,5 +1,5 @@
 name: ziggurat_sounds
-version: 0.21.0
+version: 0.22.0
 description: Provide sound support for [Ziggurat](https://github.com/chrisnorman7/ziggurat).
 repository: https://github.com/chrisnorman7/ziggurat_sounds
 
@@ -11,10 +11,10 @@ dependencies:
   encrypt: ^5.0.1
   json_annotation: ^4.4.0
   path: ^1.8.0
-  ziggurat: ^0.41.0
+  ziggurat: ^0.42.0
 
 dev_dependencies:
   build_runner: ^2.1.2
   json_serializable: ^6.0.0
-  lints: ^1.0.1
+  lints: ^2.0.0
   test: ^1.20.1
