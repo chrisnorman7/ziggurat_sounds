@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.23.1]
+
+### Changed
+
+* Updated dart_synthizer.
+
 ## [0.23.0]
 
 ### Changed
