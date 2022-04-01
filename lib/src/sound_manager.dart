@@ -27,7 +27,7 @@ class SoundManager {
   SoundManager({
     required this.game,
     required this.context,
-    List<BufferStore>? bufferStores,
+    final List<BufferStore>? bufferStores,
     this.bufferCache,
   })  : bufferStores = bufferStores ?? [],
         _reverbs = {},
@@ -77,7 +77,7 @@ class SoundManager {
   /// Get a reverb.
   ///
   /// If no such reverb is found, [NoSuchReverbError] will be thrown.
-  Reverb getReverb(int id) {
+  Reverb getReverb(final int id) {
     final reverb = _reverbs[id];
     if (reverb == null) {
       throw NoSuchReverbError(id);
@@ -88,7 +88,7 @@ class SoundManager {
   /// Get a channel.
   ///
   /// If no such channel is found, [NoSuchChannelError] will be thrown.
-  AudioChannel getChannel(int id) {
+  AudioChannel getChannel(final int id) {
     final channel = _channels[id];
     if (channel == null) {
       throw NoSuchChannelError(id);
@@ -100,7 +100,7 @@ class SoundManager {
   ///
   /// If no sound is found with the given [id], [NoSuchSoundError] will be
   /// thrown.
-  BufferGenerator getSound(int id) {
+  BufferGenerator getSound(final int id) {
     final sound = _sounds[id];
     if (sound == null) {
       throw NoSuchSoundError(id);
@@ -111,7 +111,7 @@ class SoundManager {
   /// Get a wave with the given [id].
   ///
   /// If no wave is found then [NoSuchWaveError] will be thrown.
-  FastSineBankGenerator getWave(int id) {
+  FastSineBankGenerator getWave(final int id) {
     final wave = _waves[id];
     if (wave == null) {
       throw NoSuchWaveError(id);
@@ -127,7 +127,7 @@ class SoundManager {
   /// If no buffer is found with the given [reference], then the [bufferCache]
   /// is consulted. If this comes up empty, then [NoSuchBufferError] is
   /// thrown.
-  Buffer getBuffer(AssetReference reference) {
+  Buffer getBuffer(final AssetReference reference) {
     for (final bufferStore in bufferStores) {
       try {
         return bufferStore.getBuffer(reference);
@@ -146,7 +146,7 @@ class SoundManager {
   ///
   /// This method should be used to listen for events from the [Game.sounds]
   /// stream.
-  void handleEvent(SoundEvent event) {
+  void handleEvent(final SoundEvent event) {
     if (event is SoundChannel) {
       handleSoundChannel(event);
     } else if (event is SetSoundChannelGain) {
@@ -213,7 +213,7 @@ class SoundManager {
   }
 
   /// Set the listener orientation.
-  void handleListenerOrientationEvent(ListenerOrientationEvent event) {
+  void handleListenerOrientationEvent(final ListenerOrientationEvent event) {
     context.orientation.value = Double6(
       event.x1,
       event.y1,
@@ -225,12 +225,12 @@ class SoundManager {
   }
 
   /// Set the listener position.
-  void handleListenerPositionEvent(ListenerPositionEvent event) {
+  void handleListenerPositionEvent(final ListenerPositionEvent event) {
     context.position.value = Double3(event.x, event.y, event.z);
   }
 
   /// Set the default panner strategy.
-  void handleSetDefaultPannerStrategy(SetDefaultPannerStrategy event) {
+  void handleSetDefaultPannerStrategy(final SetDefaultPannerStrategy event) {
     final PannerStrategy strategy;
     switch (event.strategy) {
       case DefaultPannerStrategy.stereo:
@@ -244,7 +244,7 @@ class SoundManager {
   }
 
   /// Cancel a fade.
-  void handleCancelAutomationFade(CancelAutomationFade event) {
+  void handleCancelAutomationFade(final CancelAutomationFade event) {
     final id = event.id!;
     switch (event.fadeType) {
       case FadeType.sound:
@@ -257,7 +257,7 @@ class SoundManager {
   }
 
   /// Fade something.
-  void handleAutomationFade(AutomationFade event) {
+  void handleAutomationFade(final AutomationFade event) {
     final timebase = context.suggestedAutomationTime.value;
     final id = event.id!;
     final Generator generator;
@@ -279,7 +279,7 @@ class SoundManager {
   }
 
   /// Set the reverb for a sound channel.
-  void handleSetSoundChannelReverb(SetSoundChannelReverb event) {
+  void handleSetSoundChannelReverb(final SetSoundChannelReverb event) {
     final reverbId = event.reverb;
     final channel = getChannel(event.id!);
     final oldReverb = channel.reverb;
@@ -296,14 +296,14 @@ class SoundManager {
   }
 
   /// Remove filtering from a sound channel.
-  void handleSoundChannelFilter(SoundChannelFilter event) {
+  void handleSoundChannelFilter(final SoundChannelFilter event) {
     getChannel(event.id!).source.filter.value = BiquadConfig.designIdentity(
       context.synthizer,
     );
   }
 
   /// Apply a bandpass to a sound channel.
-  void handleSoundChannelBandpass(SoundChannelBandpass event) {
+  void handleSoundChannelBandpass(final SoundChannelBandpass event) {
     getChannel(event.id!).source.filter.value = BiquadConfig.designBandpass(
       context.synthizer,
       event.frequency,
@@ -312,7 +312,7 @@ class SoundManager {
   }
 
   /// Apply a low pass to a sound channel.
-  void handleSoundChannelLowpass(SoundChannelLowpass event) {
+  void handleSoundChannelLowpass(final SoundChannelLowpass event) {
     getChannel(event.id!).source.filter.value = BiquadConfig.designLowpass(
       context.synthizer,
       event.frequency,
@@ -321,7 +321,7 @@ class SoundManager {
   }
 
   /// Apply a high pass to a sound channel.
-  void handleSoundChannelHighpass(SoundChannelHighpass event) {
+  void handleSoundChannelHighpass(final SoundChannelHighpass event) {
     getChannel(event.id!).source.filter.value = BiquadConfig.designHighpass(
       context.synthizer,
       event.frequency,
@@ -330,32 +330,32 @@ class SoundManager {
   }
 
   /// Apply pitch bend to a sound.
-  void handleSetSoundPitchBend(SetSoundPitchBend event) {
-    getSound(event.id!)..pitchBend.value = event.pitchBend;
+  void handleSetSoundPitchBend(final SetSoundPitchBend event) {
+    getSound(event.id!).pitchBend.value = event.pitchBend;
   }
 
   /// Set the gain for a sound.
-  void handleSetSoundGain(SetSoundGain event) {
+  void handleSetSoundGain(final SetSoundGain event) {
     getSound(event.id!).gain.value = event.gain;
   }
 
   /// Set whether or not a sound should loop.
-  void handleSetSoundLooping(SetSoundLooping event) {
+  void handleSetSoundLooping(final SetSoundLooping event) {
     getSound(event.id!).looping.value = event.looping;
   }
 
   /// Unpause a sound.
-  void handleUnpauseSound(UnpauseSound event) {
+  void handleUnpauseSound(final UnpauseSound event) {
     getSound(event.id!).play();
   }
 
   /// Pause a sound.
-  void handlePauseSound(PauseSound event) {
+  void handlePauseSound(final PauseSound event) {
     getSound(event.id!).pause();
   }
 
   /// Destroy a sound.
-  void handleDestroySound(DestroySound event) {
+  void handleDestroySound(final DestroySound event) {
     final sound = _sounds.remove(event.id);
     if (sound == null) {
       throw NoSuchSoundError(event.id!);
@@ -367,7 +367,7 @@ class SoundManager {
   }
 
   /// Play a sound.
-  void handlePlaySound(PlaySound event) {
+  void handlePlaySound(final PlaySound event) {
     final channel = getChannel(event.channel);
     final generator = BufferGenerator(context)
       ..looping.value = event.looping
@@ -385,14 +385,14 @@ class SoundManager {
   }
 
   /// Destroy a reverb.
-  void handleDestroyReverb(DestroyReverb event) {
+  void handleDestroyReverb(final DestroyReverb event) {
     final reverb = getReverb(event.id!);
     _reverbs.remove(event.id);
     reverb.reverb.destroy();
   }
 
   /// Create a new reverb.
-  void handleCreateReverb(CreateReverb event) {
+  void handleCreateReverb(final CreateReverb event) {
     final reverb = Reverb(
       id: event.id!,
       name: event.reverb.name,
@@ -402,14 +402,14 @@ class SoundManager {
   }
 
   /// Destroy a sound channel.
-  void handleDestroySoundChannel(DestroySoundChannel event) {
+  void handleDestroySoundChannel(final DestroySoundChannel event) {
     final channel = getChannel(event.id!);
     _channels.remove(event.id);
     channel.destroy();
   }
 
   /// Set the position of a sound channel.
-  void handleSetSoundChannelPosition(SetSoundChannelPosition event) {
+  void handleSetSoundChannelPosition(final SetSoundChannelPosition event) {
     final channel = getChannel(event.id!);
     final position = event.position;
     if (position is SoundPosition3d) {
@@ -428,12 +428,12 @@ class SoundManager {
   }
 
   /// Handle setting sound channel gain.
-  void handleSetSoundChannelGain(SetSoundChannelGain event) {
+  void handleSetSoundChannelGain(final SetSoundChannelGain event) {
     getChannel(event.id!).source.gain.value = event.gain;
   }
 
   /// Handle a sound channel event.
-  void handleSoundChannel(SoundChannel event) {
+  void handleSoundChannel(final SoundChannel event) {
     final position = event.position;
     final Source source;
     if (position is SoundPosition3d) {
@@ -443,7 +443,9 @@ class SoundManager {
       source = context.createScalarPannedSource(panningScalar: position.scalar);
     } else if (position is SoundPositionAngular) {
       source = context.createAngularPannedSource(
-          azimuth: position.azimuth, elevation: position.elevation);
+        azimuth: position.azimuth,
+        elevation: position.elevation,
+      );
     } else {
       source = DirectSource(context);
     }
@@ -461,7 +463,7 @@ class SoundManager {
   }
 
   /// Play a wave.
-  void handlePlayWave(PlayWave event) {
+  void handlePlayWave(final PlayWave event) {
     final channel = getChannel(event.channel);
     final FastSineBankGenerator generator;
     switch (event.waveType) {
@@ -499,17 +501,17 @@ class SoundManager {
   }
 
   /// Set the gain for a wave.
-  void handleSetWaveGain(SetWaveGain event) {
+  void handleSetWaveGain(final SetWaveGain event) {
     getWave(event.id!).gain.value = event.gain;
   }
 
   /// Set the frequency of a wave.
-  void handleSetWaveFrequency(SetWaveFrequency event) {
+  void handleSetWaveFrequency(final SetWaveFrequency event) {
     getWave(event.id!).frequency.value = event.frequency;
   }
 
   /// Automate the frequency of a wave.
-  void handleAutomateWaveFrequency(AutomateWaveFrequency event) {
+  void handleAutomateWaveFrequency(final AutomateWaveFrequency event) {
     final timebase = context.suggestedAutomationTime.value;
     getWave(event.id!).frequency.automate(
           context,
@@ -521,17 +523,17 @@ class SoundManager {
   }
 
   /// Pause a wave.
-  void handlePauseWave(PauseWave event) {
+  void handlePauseWave(final PauseWave event) {
     getWave(event.id!).pause();
   }
 
   /// Unpause a wave.
-  void handleUnpauseWave(UnpauseWave event) {
+  void handleUnpauseWave(final UnpauseWave event) {
     getWave(event.id!).play();
   }
 
   /// Destroy a wave.
-  void handleDestroyWave(DestroyWave event) {
+  void handleDestroyWave(final DestroyWave event) {
     final id = event.id!;
     final generator = _waves.remove(id);
     if (generator == null) {

@@ -2,6 +2,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+const _jsonEncoder = JsonEncoder.withIndent('  ');
+
 /// A mixin for providing simple dumping and loading.
 mixin DumpLoadMixin {
   /// Convert this object to JSON.
@@ -10,10 +12,9 @@ mixin DumpLoadMixin {
   }
 
   /// Dump an instance to [file].
-  void dump(File file) {
-    final jsonEncoder = JsonEncoder.withIndent('  ');
+  void dump(final File file) {
     final data = toJson();
-    final json = jsonEncoder.convert(data);
+    final json = _jsonEncoder.convert(data);
     file.writeAsStringSync(json);
   }
 }

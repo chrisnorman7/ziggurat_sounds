@@ -4,7 +4,7 @@ import 'package:ziggurat/ziggurat.dart';
 import 'buffer_store.dart';
 
 /// The base class for all errors in this package.
-class ZigguratSoundsError extends Error {}
+class ZigguratSoundsError implements Exception {}
 
 /// No such buffer was found in a [BufferStore] instance.
 class NoSuchBufferError extends ZigguratSoundsError {

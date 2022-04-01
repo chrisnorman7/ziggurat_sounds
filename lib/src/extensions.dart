@@ -6,7 +6,7 @@ import 'package:ziggurat/sound.dart';
 /// [ReverbPreset] instance.
 extension MakeGlobalFdnReverb on ReverbPreset {
   /// Make a reverb object from this preset.
-  GlobalFdnReverb makeReverb(Context context) {
+  GlobalFdnReverb makeReverb(final Context context) {
     final r = GlobalFdnReverb(context)
       ..meanFreePath.value = meanFreePath
       ..t60.value = t60

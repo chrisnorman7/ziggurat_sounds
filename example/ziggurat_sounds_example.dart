@@ -23,7 +23,8 @@ Future<void> main() async {
   print('Created a sound manager.');
   game.sounds.listen(soundManager.handleEvent);
   print(
-      'Created a game and registered the sound manager to listen for events.');
+    'Created a game and registered the sound manager to listen for events.',
+  );
   game.interfaceSounds.playSound(bufferStore.getSoundReference('aim.wav'));
   ctx.destroy();
   print('Destroyed context.');

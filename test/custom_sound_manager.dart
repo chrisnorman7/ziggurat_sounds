@@ -8,9 +8,9 @@ import 'package:ziggurat_sounds/ziggurat_sounds.dart';
 class CustomSoundManager extends SoundManager {
   /// Create an instance.
   CustomSoundManager({
-    required Game game,
-    required Context context,
-    required List<BufferStore> bufferStores,
+    required final Game game,
+    required final Context context,
+    required final List<BufferStore> bufferStores,
   })  : events = [],
         super(game: game, context: context, bufferStores: bufferStores);
 
@@ -18,7 +18,7 @@ class CustomSoundManager extends SoundManager {
   final List<SoundEvent> events;
 
   @override
-  void handleEvent(SoundEvent event) {
+  void handleEvent(final SoundEvent event) {
     super.handleEvent(event);
     events.add(event);
   }

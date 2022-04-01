@@ -9,10 +9,10 @@ import 'package:ziggurat_sounds/ziggurat_sounds.dart';
 /// A custom buffer store that always returns a buffer.
 class CustomBufferStore extends BufferStore {
   /// Create an instance.
-  CustomBufferStore(Random random, Synthizer synthizer)
+  CustomBufferStore(final Random random, final Synthizer synthizer)
       : super(random, synthizer);
 
   @override
-  Buffer getBuffer(AssetReference reference) =>
+  Buffer getBuffer(final AssetReference reference) =>
       Buffer.fromFile(synthizer, File('sound.wav'));
 }

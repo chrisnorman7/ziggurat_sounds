@@ -10,9 +10,11 @@ import 'package:ziggurat/ziggurat.dart';
 /// This class implements an LRU cache.
 class BufferCache {
   /// Create a cache.
-  BufferCache(
-      {required this.synthizer, required this.maxSize, required this.random})
-      : _buffers = {},
+  BufferCache({
+    required this.synthizer,
+    required this.maxSize,
+    required this.random,
+  })  : _buffers = {},
         _files = [];
 
   /// The synthizer instance to use.
@@ -42,7 +44,7 @@ class BufferCache {
   int get size => _size;
 
   /// Get a buffer.
-  Buffer getBuffer(AssetReference reference) {
+  Buffer getBuffer(final AssetReference reference) {
     final file = reference.getFile(random);
     var buffer = _buffers[file.path];
     if (buffer == null) {

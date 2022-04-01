@@ -55,8 +55,11 @@ class BufferStore {
   final List<String> _protectedBufferCollections;
 
   /// add a buffer from a file.
-  Future<AssetReference> addFile(File file,
-      {String? name, bool protected = false}) async {
+  Future<AssetReference> addFile(
+    final File file, {
+    String? name,
+    final bool protected = false,
+  }) async {
     final buffer = Buffer.fromBytes(synthizer, await file.readAsBytes());
     name ??= file.path;
     _bufferFiles[name] = buffer;
@@ -67,8 +70,11 @@ class BufferStore {
   }
 
   /// Add a directory of files as a collection.
-  Future<AssetReference> addDirectory(Directory directory,
-      {String? name, bool protected = false}) async {
+  Future<AssetReference> addDirectory(
+    final Directory directory, {
+    String? name,
+    final bool protected = false,
+  }) async {
     final buffers = <Buffer>[];
     for (final file in directory.listSync()) {
       if (file is File) {
@@ -87,7 +93,7 @@ class BufferStore {
   ///
   /// If [protected] is `true`, then each entry will be protected from the
   /// [clear] method.
-  void addVaultFile(VaultFile vaultFile, {bool protected = false}) {
+  void addVaultFile(final VaultFile vaultFile, {final bool protected = false}) {
     for (final entry in vaultFile.files.entries) {
       final name = entry.key;
       if (_bufferFiles.containsKey(name)) {
@@ -118,7 +124,7 @@ class BufferStore {
   /// Remove a buffer file.
   ///
   /// This method does not care if [name] is protected.
-  void removeBufferFile(String name) {
+  void removeBufferFile(final String name) {
     final buffer = _bufferFiles.remove(name);
     if (buffer != null) {
       buffer.destroy();
@@ -131,7 +137,7 @@ class BufferStore {
   /// Remove a buffer collection.
   ///
   /// This method does not care if [name] is protected.
-  void removeBufferCollection(String name) {
+  void removeBufferCollection(final String name) {
     final buffers = _bufferCollections.remove(name);
     if (buffers != null) {
       for (final buffer in buffers) {
@@ -148,7 +154,7 @@ class BufferStore {
   /// If [includeProtected] is `true`, then all buffers will be cleared.
   ///
   /// Otherwise, those buffers that are protected will be skipped.
-  void clear({bool includeProtected = false}) {
+  void clear({final bool includeProtected = false}) {
     for (final name in _bufferFiles.keys.toList()) {
       if (includeProtected == true ||
           _protectedBufferFiles.contains(name) == false) {
@@ -171,7 +177,7 @@ class BufferStore {
   ///
   /// If no buffer is found by the given [reference], [NoSuchBufferError] will
   /// be thrown.
-  Buffer getBuffer(AssetReference reference) {
+  Buffer getBuffer(final AssetReference reference) {
     switch (reference.type) {
       case AssetType.file:
         final buffer = _bufferFiles[reference.name];
@@ -195,7 +201,7 @@ class BufferStore {
   /// valid reference.
   ///
   /// If nothing is found, [NoSuchBufferError] will be thrown.
-  AssetReference getSoundReference(String name) {
+  AssetReference getSoundReference(final String name) {
     if (_bufferFiles.containsKey(name)) {
       return AssetReference.file(name);
     } else if (_bufferCollections.containsKey(name)) {

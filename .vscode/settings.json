@@ -5,6 +5,7 @@
     "asdf",
     "Behavior",
     "Biquad",
+    "bools",
     "ctx",
     "encrypter",
     "Fdn",
@@ -21,6 +22,8 @@
     "Rolloff",
     "sdl",
     "synthizer",
+    "todos",
+    "unawaited",
     "var",
     "writeln"
   ],

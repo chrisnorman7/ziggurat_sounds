@@ -15,7 +15,7 @@ class DataFileEntry {
   DataFileEntry(this.variableName, this.fileName, {this.comment});
 
   /// Create an instance from a JSON object.
-  factory DataFileEntry.fromJson(Map<String, dynamic> json) =>
+  factory DataFileEntry.fromJson(final Map<String, dynamic> json) =>
       _$DataFileEntryFromJson(json);
 
   /// The name of the resulting dart variable.
@@ -37,16 +37,17 @@ class DataFileEntry {
 @JsonSerializable()
 class DataFile with DumpLoadMixin {
   /// Create an instance.
-  DataFile({this.comment, List<DataFileEntry>? entries})
+  DataFile({this.comment, final List<DataFileEntry>? entries})
       : entries = entries ?? [];
 
   /// Create an instance from a JSON object.
-  factory DataFile.fromJson(Map<String, dynamic> json) =>
+  factory DataFile.fromJson(final Map<String, dynamic> json) =>
       _$DataFileFromJson(json);
 
   /// Create an instance from a file.
-  factory DataFile.fromFile(File file) => DataFile.fromJson(
-      jsonDecode(file.readAsStringSync()) as Map<String, dynamic>);
+  factory DataFile.fromFile(final File file) => DataFile.fromJson(
+        jsonDecode(file.readAsStringSync()) as Map<String, dynamic>,
+      );
 
   /// All the entries for this file.
   final List<DataFileEntry> entries;

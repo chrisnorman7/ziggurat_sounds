@@ -23,7 +23,7 @@ class AssetReferenceReference {
   });
 
   /// Create an instance from a JSON object.
-  factory AssetReferenceReference.fromJson(Map<String, dynamic> json) =>
+  factory AssetReferenceReference.fromJson(final Map<String, dynamic> json) =>
       _$AssetReferenceReferenceFromJson(json);
 
   /// The name of the resulting variable.
@@ -53,11 +53,11 @@ class AssetStore with DumpLoadMixin {
   });
 
   /// Create an instance from a JSON object.
-  factory AssetStore.fromJson(Map<String, dynamic> json) =>
+  factory AssetStore.fromJson(final Map<String, dynamic> json) =>
       _$AssetStoreFromJson(json);
 
   /// Create an instance from [file].
-  factory AssetStore.fromFile(File file) {
+  factory AssetStore.fromFile(final File file) {
     final dynamic json = jsonDecode(file.readAsStringSync());
     return AssetStore.fromJson(json as Map<String, dynamic>);
   }
@@ -72,7 +72,7 @@ class AssetStore with DumpLoadMixin {
   Directory get directory => Directory(destination);
 
   /// Get an absolute version of [directory], relative to [relativeTo].
-  Directory getAbsoluteDirectory(Directory relativeTo) => Directory(
+  Directory getAbsoluteDirectory(final Directory relativeTo) => Directory(
         path.join(relativeTo.path, destination),
       );
 
@@ -88,8 +88,8 @@ class AssetStore with DumpLoadMixin {
 
   /// Get an unused filename.
   String getNextFilename({
-    String suffix = '',
-    Directory? relativeTo,
+    final String suffix = '',
+    final Directory? relativeTo,
   }) {
     final Directory d;
     if (relativeTo != null) {
@@ -118,10 +118,10 @@ class AssetStore with DumpLoadMixin {
   /// If this asset store is located in a directory other than the current one,
   /// use the [relativeTo] argument to ensure paths still work.
   AssetReferenceReference importFile({
-    required File source,
-    required String variableName,
-    String? comment,
-    Directory? relativeTo,
+    required final File source,
+    required final String variableName,
+    final String? comment,
+    final Directory? relativeTo,
   }) {
     final Directory d;
     if (relativeTo != null) {
@@ -161,10 +161,10 @@ class AssetStore with DumpLoadMixin {
   /// If this asset store is located in a directory other than the current one,
   /// use the [relativeTo] argument to ensure paths still work.
   AssetReferenceReference importDirectory({
-    required Directory source,
-    required String variableName,
-    String? comment,
-    Directory? relativeTo,
+    required final Directory source,
+    required final String variableName,
+    final String? comment,
+    final Directory? relativeTo,
   }) {
     final Directory d;
     if (relativeTo != null) {
@@ -186,7 +186,7 @@ class AssetStore with DumpLoadMixin {
     final iv = IV.fromLength(16);
     final encrypter = Encrypter(AES(key));
     for (final entity in source.listSync().whereType<File>()) {
-      final filename = path.basename(entity.path) + '.encrypted';
+      final filename = '${path.basename(entity.path)}.encrypted';
       final data =
           encrypter.encryptBytes(entity.readAsBytesSync(), iv: iv).bytes;
       File(path.join(absoluteDirectoryName, filename)).writeAsBytesSync(data);

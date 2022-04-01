@@ -38,42 +38,51 @@ class VaultFile {
   ///
   /// If you have an encrypted string (loaded from the network for example), you
   /// can load it with the [VaultFile.fromEncryptedString] constructor.
-  VaultFile({FilesType? files, FoldersType? folders})
+  VaultFile({final FilesType? files, final FoldersType? folders})
       : files = files ?? {},
         folders = folders ?? {};
 
   /// Create an instance from a JSON object.
-  factory VaultFile.fromJson(Map<String, dynamic> json) =>
+  factory VaultFile.fromJson(final Map<String, dynamic> json) =>
       _$VaultFileFromJson(json);
 
   /// Create an instance from an encrypted string.
-  factory VaultFile.fromEncryptedString(
-      {required String contents, required String encryptionKey}) {
+  factory VaultFile.fromEncryptedString({
+    required final String contents,
+    required final String encryptionKey,
+  }) {
     final encrypter = Encrypter(AES(Key.fromBase64(encryptionKey)));
     final iv = IV.fromLength(16);
     final encrypted = Encrypted.fromBase64(contents);
     final data = encrypter.decrypt(encrypted, iv: iv);
-    final Map<String, dynamic> json = jsonDecode(data) as Map<String, dynamic>;
+    final json = jsonDecode(data) as Map<String, dynamic>;
     return VaultFile.fromJson(json);
   }
 
   /// Create an instance from a file synchronously.
-  factory VaultFile.fromFileSync(File file, String encryptionKey) =>
+  factory VaultFile.fromFileSync(final File file, final String encryptionKey) =>
       VaultFile.fromEncryptedString(
-          contents: file.readAsStringSync(), encryptionKey: encryptionKey);
+        contents: file.readAsStringSync(),
+        encryptionKey: encryptionKey,
+      );
 
   /// Return an instance loaded from [file].
   ///
   /// This method reads the file in chunks, then creates the [VaultFile]
   /// instance.
-  static Future<VaultFile> fromFile(File file, String encryptionKey) async {
+  static Future<VaultFile> fromFile(
+    final File file,
+    final String encryptionKey,
+  ) async {
     final buffer = StringBuffer();
     final reader = file.openRead();
     await for (final chunk in reader) {
       buffer.write(String.fromCharCodes(chunk));
     }
     return VaultFile.fromEncryptedString(
-        contents: buffer.toString(), encryptionKey: encryptionKey);
+      contents: buffer.toString(),
+      encryptionKey: encryptionKey,
+    );
   }
 
   /// A map of filenames to contents.
@@ -91,7 +100,7 @@ class VaultFile {
   Map<String, dynamic> toJson() => _$VaultFileToJson(this);
 
   /// Convert this instance to an encrypted string.
-  String toEncryptedString({required String encryptionKey}) {
+  String toEncryptedString({required final String encryptionKey}) {
     final key = Key.fromBase64(encryptionKey);
     final iv = IV.fromLength(16);
     final encrypter = Encrypter(AES(key));
@@ -103,7 +112,7 @@ class VaultFile {
   /// Write an encrypted version of this file to disk.
   ///
   /// This method uses the [toEncryptedString] method to write the [file].
-  void write(File file, String encryptionKey) =>
+  void write(final File file, final String encryptionKey) =>
       file.writeAsStringSync(toEncryptedString(encryptionKey: encryptionKey));
 }
 
@@ -117,20 +126,21 @@ class VaultFile {
 @JsonSerializable()
 class VaultFileStub with DumpLoadMixin {
   /// Create an instance.
-  VaultFileStub(
-      {VaultFileStubEntriesType? files,
-      VaultFileStubEntriesType? folders,
-      this.comment})
-      : files = files ?? [],
+  VaultFileStub({
+    final VaultFileStubEntriesType? files,
+    final VaultFileStubEntriesType? folders,
+    this.comment,
+  })  : files = files ?? [],
         folders = folders ?? [];
 
   /// Create an instance from a JSON object.
-  factory VaultFileStub.fromJson(Map<String, dynamic> json) =>
+  factory VaultFileStub.fromJson(final Map<String, dynamic> json) =>
       _$VaultFileStubFromJson(json);
 
   /// Create an instance from a file.
-  factory VaultFileStub.fromFile(File file) => VaultFileStub.fromJson(
-      jsonDecode(file.readAsStringSync()) as Map<String, dynamic>);
+  factory VaultFileStub.fromFile(final File file) => VaultFileStub.fromJson(
+        jsonDecode(file.readAsStringSync()) as Map<String, dynamic>,
+      );
 
   /// The comment to place at the top of the resulting Dart file.
   final String? comment;

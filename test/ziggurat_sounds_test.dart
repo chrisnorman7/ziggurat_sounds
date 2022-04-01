@@ -72,28 +72,35 @@ void main() {
       test(
         'Reverb',
         () async {
-          final preset = ReverbPreset(name: 'Test Reverb');
+          const preset = ReverbPreset(name: 'Test Reverb');
           expect(preset.gain, equals(0.5));
           final reverbEvent = game.createReverb(preset);
           expect(reverbEvent.reverb, equals(preset));
-          await Future<void>.delayed(Duration(milliseconds: 100));
+          await Future<void>.delayed(const Duration(milliseconds: 100));
           expect(soundManager.events.length, 4);
           expect(soundManager.events.last, equals(reverbEvent));
           final reverb = soundManager.getReverb(SoundEvent.maxEventId);
           expect(
-              reverb,
-              predicate(
-                  (value) => value is Reverb && value.name == preset.name));
+            reverb,
+            predicate(
+              (final value) => value is Reverb && value.name == preset.name,
+            ),
+          );
           expect(reverb.reverb.gain.value, equals(preset.gain));
           reverbEvent.destroy();
           await Future<void>.delayed(Duration.zero);
-          expect(() => soundManager.getReverb(reverbEvent.id!),
-              throwsA(isA<NoSuchReverbError>()));
+          expect(
+            () => soundManager.getReverb(reverbEvent.id!),
+            throwsA(isA<NoSuchReverbError>()),
+          );
           expect(soundManager.events.length, 5);
           expect(
-              soundManager.events.last,
-              predicate((value) =>
-                  value is DestroyReverb && value.id == reverbEvent.id));
+            soundManager.events.last,
+            predicate(
+              (final value) =>
+                  value is DestroyReverb && value.id == reverbEvent.id,
+            ),
+          );
         },
       );
       test(
@@ -101,7 +108,7 @@ void main() {
         () async {
           var length = soundManager.events.length;
           var channelEvent = game.createSoundChannel();
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           var channel = soundManager.getChannel(channelEvent.id!);
           expect(soundManager.events.length, equals(length + 1));
           expect(channel.id, equals(channelEvent.id));
@@ -110,25 +117,25 @@ void main() {
           expect(source, isA<DirectSource>());
           expect(source.gain.value, equals(0.70));
           channelEvent.gain *= 2;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(source.gain.value, equals(1.4));
           channelEvent =
-              game.createSoundChannel(position: SoundPositionScalar());
-          await Future<void>.delayed(Duration(milliseconds: 200));
+              game.createSoundChannel(position: const SoundPositionScalar());
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           channel = soundManager.getChannel(channelEvent.id!);
           source = channel.source;
           if (source is ScalarPannedSource) {
             expect(source.panningScalar.value, isZero);
-            channelEvent.position = SoundPositionScalar(scalar: -1.0);
-            await Future<void>.delayed(Duration(milliseconds: 200));
+            channelEvent.position = const SoundPositionScalar(scalar: -1.0);
+            await Future<void>.delayed(const Duration(milliseconds: 200));
             expect(source.panningScalar.value, equals(-1.0));
           } else {
             throw Exception('Source is not `ScalarPannedSource`.');
           }
           channelEvent = game.createSoundChannel(
-            position: SoundPositionAngular(),
+            position: const SoundPositionAngular(),
           );
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           channel = soundManager.getChannel(channelEvent.id!);
           source = channel.source;
           if (source is AngularPannedSource) {
@@ -136,8 +143,8 @@ void main() {
             expect(source.elevation.value, isZero);
             expect(source.gain.value, equals(channelEvent.gain));
             channelEvent.position =
-                SoundPositionAngular(azimuth: 90.0, elevation: 45.0);
-            await Future<void>.delayed(Duration(milliseconds: 200));
+                const SoundPositionAngular(azimuth: 90.0, elevation: 45.0);
+            await Future<void>.delayed(const Duration(milliseconds: 200));
             expect(source.azimuth.value, equals(90.0));
             expect(source.elevation.value, equals(45.0));
             expect(source.gain.value, equals(channelEvent.gain));
@@ -151,7 +158,7 @@ void main() {
           // filters
           length = soundManager.events.length;
           channelEvent.filterBandpass(440.0, 200.0);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(soundManager.events.length, equals(++length));
           var event = soundManager.events.last;
           expect(event, isA<SoundChannelBandpass>());
@@ -161,21 +168,21 @@ void main() {
           channelEvent.filterHighpass(
             440.0,
           );
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(soundManager.events.length, equals(++length));
           event = soundManager.events.last;
           expect(event, isA<SoundChannelHighpass>());
           expect(event.id, equals(channel.id));
           expect((event as SoundChannelHighpass).frequency, equals(440.0));
           channelEvent.filterLowpass(440.0);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(soundManager.events.length, equals(++length));
           event = soundManager.events.last;
           expect(event, isA<SoundChannelLowpass>());
           expect(event.id, equals(channel.id));
           expect((event as SoundChannelLowpass).frequency, equals(440.0));
           channelEvent.clearFilter();
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(soundManager.events.length, equals(++length));
           event = soundManager.events.last;
           expect(event, isA<SoundChannelFilter>());
@@ -183,8 +190,9 @@ void main() {
           expect(event, isNot(isA<SoundChannelHighpass>()));
           expect(event, isNot(isA<SoundChannelLowpass>()));
           expect(event, isNot(isA<SoundChannelBandpass>()));
-          channelEvent = game.createSoundChannel(position: SoundPosition3d());
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          channelEvent =
+              game.createSoundChannel(position: const SoundPosition3d());
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           channel = soundManager.getChannel(channelEvent.id!);
           source = channel.source;
           if (source is Source3D) {
@@ -192,24 +200,27 @@ void main() {
             expect(position.value.x, isZero);
             expect(position.value.y, isZero);
             expect(position.value.z, isZero);
-            channelEvent.position = SoundPosition3d(x: 1.0, y: 2.0, z: 3.0);
-            await Future<void>.delayed(Duration(milliseconds: 200));
-            expect(source.position.value, equals(Double3(1.0, 2.0, 3.0)));
+            channelEvent.position =
+                const SoundPosition3d(x: 1.0, y: 2.0, z: 3.0);
+            await Future<void>.delayed(const Duration(milliseconds: 200));
+            expect(source.position.value, equals(const Double3(1.0, 2.0, 3.0)));
             expect(source.gain.value, equals(channelEvent.gain));
           } else {
             throw Exception('Source is not of type `Source3D`.');
           }
           channelEvent.destroy();
           await Future<void>.delayed(Duration.zero);
-          expect(() => soundManager.getChannel(channelEvent.id!),
-              throwsA(isA<NoSuchChannelError>()));
+          expect(
+            () => soundManager.getChannel(channelEvent.id!),
+            throwsA(isA<NoSuchChannelError>()),
+          );
         },
       );
       test(
         'Sound',
         () async {
           final channel = game.createSoundChannel();
-          var sound = channel.playSound(AssetReference.file('test.wav'));
+          var sound = channel.playSound(const AssetReference.file('test.wav'));
           expect(sound.channel, equals(channel.id));
           expect(sound.looping, isFalse);
           expect(sound.keepAlive, isFalse);
@@ -218,50 +229,52 @@ void main() {
           final channelObject = soundManager.getChannel(channel.id!);
           expect(channelObject.sounds[sound.id], isNull);
           sound = channel.playSound(
-            AssetReference.file('another.wav'),
+            const AssetReference.file('another.wav'),
             keepAlive: true,
           );
           expect(sound.keepAlive, isTrue);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           final generator = channelObject.sounds[sound.id]!;
           expect(generator, isA<BufferGenerator>());
           expect(soundManager.getSound(sound.id!), isA<BufferGenerator>());
           // We know it is, but now Dart does too.
           expect(generator.gain.value, equals(sound.gain));
           sound.looping = true;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(generator.looping.value, isTrue);
           sound.looping = false;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(generator.looping.value, isFalse);
           sound.gain = 1.5;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(generator.gain.value, equals(1.5));
           sound.gain = 1.0;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(generator.gain.value, equals(1.0));
           final fade = sound.fade(length: 1.0, startGain: 1.0);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(generator.gain.value, lessThan(1.0));
           fade.cancel();
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           final gain = generator.gain.value;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(generator.gain.value, equals(gain));
           sound.destroy();
           await Future<void>.delayed(Duration.zero);
           expect(channelObject.sounds[sound.id], isNull);
           sound = channel.playSound(
-            AssetReference.file('looping.wav'),
+            const AssetReference.file('looping.wav'),
             looping: true,
             keepAlive: true,
           );
           expect(sound.looping, isTrue);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(
             channelObject.sounds[sound.id],
-            predicate((value) =>
-                value is BufferGenerator && value.looping.value == true),
+            predicate(
+              (final value) =>
+                  value is BufferGenerator && value.looping.value == true,
+            ),
           );
           sound.destroy();
         },
@@ -274,27 +287,36 @@ void main() {
       test(
         'set default panner strategy',
         () async {
-          expect(context.defaultPannerStrategy.value,
-              equals(PannerStrategy.stereo));
-          game.setDefaultPannerStrategy(DefaultPannerStrategy.hrtf);
-          await Future<void>.delayed(Duration(milliseconds: 200));
           expect(
-              context.defaultPannerStrategy.value, equals(PannerStrategy.hrtf));
+            context.defaultPannerStrategy.value,
+            equals(PannerStrategy.stereo),
+          );
+          game.setDefaultPannerStrategy(DefaultPannerStrategy.hrtf);
+          await Future<void>.delayed(const Duration(milliseconds: 200));
+          expect(
+            context.defaultPannerStrategy.value,
+            equals(PannerStrategy.hrtf),
+          );
           game.setDefaultPannerStrategy(DefaultPannerStrategy.stereo);
-          await Future<void>.delayed(Duration(milliseconds: 200));
-          expect(context.defaultPannerStrategy.value,
-              equals(PannerStrategy.stereo));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
+          expect(
+            context.defaultPannerStrategy.value,
+            equals(PannerStrategy.stereo),
+          );
         },
       );
       test(
         'Set listener position',
         () async {
           game.setListenerPosition(1.0, 2.0, 3.0);
-          await Future<void>.delayed(Duration(milliseconds: 200));
-          expect(context.position.value, equals(Double3(1.0, 2.0, 3.0)));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
+          expect(context.position.value, equals(const Double3(1.0, 2.0, 3.0)));
           game.setListenerPosition(10.0, 20.0, 30.0);
-          await Future<void>.delayed(Duration(milliseconds: 200));
-          expect(context.position.value, equals(Double3(10.0, 20.0, 30.0)));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
+          expect(
+            context.position.value,
+            equals(const Double3(10.0, 20.0, 30.0)),
+          );
         },
       );
       test(
@@ -302,7 +324,7 @@ void main() {
         () async {
           var angle = 180.0;
           game.setListenerOrientation(angle);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           var orientation = context.orientation;
           expect(orientation.value.x1, equals(sin(angle * pi / 180)));
           expect(orientation.value.y1, equals(cos(angle * pi / 180.0)));
@@ -312,7 +334,7 @@ void main() {
           expect(orientation.value.z2, equals(1));
           angle = 90.0;
           game.setListenerOrientation(angle);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           orientation = context.orientation;
           expect(orientation.value.x1, equals(sin(angle * pi / 180)));
           expect(orientation.value.y1, equals(cos(angle * pi / 180.0)));
@@ -346,30 +368,37 @@ void main() {
         '.getBuffer',
         () async {
           expect(
-              () => soundManager.getBuffer(AssetReference.file('silence.wav')),
-              throwsA(isA<NoSuchBufferError>()));
+            () => soundManager
+                .getBuffer(const AssetReference.file('silence.wav')),
+            throwsA(isA<NoSuchBufferError>()),
+          );
           await bufferStore.addFile(File('silence.wav'));
           soundManager.bufferStores.add(bufferStore);
-          expect(soundManager.getBuffer(AssetReference.file('silence.wav')),
-              isA<Buffer>());
+          expect(
+            soundManager.getBuffer(const AssetReference.file('silence.wav')),
+            isA<Buffer>(),
+          );
           soundManager = SoundManager(
             game: game,
             context: context,
             bufferCache: BufferCache(
-                synthizer: synthizer,
-                maxSize: pow(1024, 3).floor(),
-                random: random),
+              synthizer: synthizer,
+              maxSize: pow(1024, 3).floor(),
+              random: random,
+            ),
           );
           final buffer =
-              soundManager.getBuffer(AssetReference.file('sound.wav'));
+              soundManager.getBuffer(const AssetReference.file('sound.wav'));
           expect(buffer, isA<Buffer>());
         },
       );
       test(
         '.getChannel',
         () {
-          expect(() => soundManager.getChannel(1),
-              throwsA(isA<NoSuchChannelError>()));
+          expect(
+            () => soundManager.getChannel(1),
+            throwsA(isA<NoSuchChannelError>()),
+          );
           soundManager.handleEvent(SoundChannel(game: game, id: 1));
           final channel = soundManager.getChannel(1);
           expect(channel, isA<AudioChannel>());
@@ -387,7 +416,10 @@ void main() {
           );
           soundManager.handleEvent(
             CreateReverb(
-                game: game, id: 2, reverb: ReverbPreset(name: 'Test Reverb')),
+              game: game,
+              id: 2,
+              reverb: const ReverbPreset(name: 'Test Reverb'),
+            ),
           );
           final reverb = soundManager.getReverb(2);
           expect(reverb, isA<Reverb>());
@@ -403,15 +435,16 @@ void main() {
             throwsA(isA<NoSuchSoundError>()),
           );
           expect(
-            bufferStore.getBuffer(AssetReference.file('silence.wav')),
+            bufferStore.getBuffer(const AssetReference.file('silence.wav')),
             isA<Buffer>(),
           );
           soundManager.bufferStores.add(bufferStore);
           final soundEvent = PlaySound(
-              game: game,
-              sound: AssetReference.file('silence.wav'),
-              channel: game.interfaceSounds.id!,
-              keepAlive: true);
+            game: game,
+            sound: const AssetReference.file('silence.wav'),
+            channel: game.interfaceSounds.id!,
+            keepAlive: true,
+          );
           soundManager.handleEvent(soundEvent);
           final sound = soundManager.getSound(soundEvent.id!);
           expect(sound, isA<BufferGenerator>());
@@ -428,30 +461,32 @@ void main() {
           );
           game.sounds.listen(soundManager.handleEvent);
           final channel = game.createSoundChannel();
-          final reverb = game.createReverb(ReverbPreset(name: 'Test Reverb'));
+          final reverb =
+              game.createReverb(const ReverbPreset(name: 'Test Reverb'));
           expect(channel.reverb, isNull);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(soundManager.events.length, 5);
           final source = soundManager.getChannel(channel.id!);
           expect(source.reverb, isNull);
           expect(soundManager.getChannel(channel.id!), source);
           expect(source.id, channel.id);
           expect(soundManager.getReverb(reverb.id!), isNotNull);
-          await Future<void>.delayed(Duration(milliseconds: 20));
-          channel.reverb = reverb.id!;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+          channel.reverb = reverb.id;
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(
             source.reverb,
             predicate(
-              (value) => value is Reverb && value.id == reverb.id,
+              (final value) => value is Reverb && value.id == reverb.id,
             ),
           );
           channel.reverb = null;
-          await Future<void>.delayed(Duration(milliseconds: 50));
+          await Future<void>.delayed(const Duration(milliseconds: 50));
           expect(source.reverb, isNull);
-          final reverb2 = game.createReverb(ReverbPreset(name: 'Preset 2'));
-          channel.reverb = reverb2.id!;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          final reverb2 =
+              game.createReverb(const ReverbPreset(name: 'Preset 2'));
+          channel.reverb = reverb2.id;
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(source.reverb?.id, reverb2.id);
         },
       );
@@ -513,8 +548,10 @@ void main() {
           bufferStore.clear();
           expect(bufferStore.bufferCollections, isEmpty);
           expect(bufferStore.bufferFiles, isEmpty);
-          await bufferStore.addDirectory(Directory('silences'),
-              protected: true);
+          await bufferStore.addDirectory(
+            Directory('silences'),
+            protected: true,
+          );
           await bufferStore.addFile(File('silence.wav'), protected: true);
           bufferStore.clear();
           expect(bufferStore.bufferCollections.length, equals(1));
@@ -559,9 +596,10 @@ void main() {
         'Initialisation',
         () {
           final cache = BufferCache(
-              synthizer: synthizer,
-              maxSize: pow(1024, 3).floor(),
-              random: random);
+            synthizer: synthizer,
+            maxSize: pow(1024, 3).floor(),
+            random: random,
+          );
           expect(cache.maxSize, equals(1073741824));
           expect(cache.random, equals(random));
           expect(cache.size, isZero);
@@ -572,13 +610,16 @@ void main() {
         '.getBuffer',
         () {
           final cache = BufferCache(
-              synthizer: synthizer,
-              maxSize: pow(1024, 3).floor(),
-              random: random);
-          final buffer1 = cache.getBuffer(AssetReference.file('sound.wav'));
+            synthizer: synthizer,
+            maxSize: pow(1024, 3).floor(),
+            random: random,
+          );
+          final buffer1 =
+              cache.getBuffer(const AssetReference.file('sound.wav'));
           expect(buffer1, isA<Buffer>());
           expect(cache.size, equals(buffer1.size));
-          final buffer2 = cache.getBuffer(AssetReference.file('silence.wav'));
+          final buffer2 =
+              cache.getBuffer(const AssetReference.file('silence.wav'));
           expect(buffer2, isA<Buffer>());
           expect(cache.size, equals(buffer1.size + buffer2.size));
         },
@@ -587,15 +628,17 @@ void main() {
         '.destroy',
         () {
           final cache = BufferCache(
-              synthizer: synthizer,
-              maxSize: pow(1024, 3).floor(),
-              random: random);
-          var buffer1 = cache.getBuffer(AssetReference.file('sound.wav'));
-          final buffer2 = cache.getBuffer(AssetReference.file('silence.wav'));
+            synthizer: synthizer,
+            maxSize: pow(1024, 3).floor(),
+            random: random,
+          );
+          var buffer1 = cache.getBuffer(const AssetReference.file('sound.wav'));
+          final buffer2 =
+              cache.getBuffer(const AssetReference.file('silence.wav'));
           expect(cache.size, equals(buffer1.size + buffer2.size));
           cache.destroy();
           expect(cache.size, isZero);
-          buffer1 = cache.getBuffer(AssetReference.file('sound.wav'));
+          buffer1 = cache.getBuffer(const AssetReference.file('sound.wav'));
           expect(cache.size, equals(buffer1.size));
         },
       );
@@ -607,7 +650,7 @@ void main() {
       test(
         'Initialise',
         () {
-          var store = AssetStore(
+          var store = const AssetStore(
             filename: 'test.dart',
             destination: 'assets',
             assets: [],
@@ -627,16 +670,19 @@ void main() {
           expect(store.assets, isEmpty);
           expect(store.comment, equals('Testing.'));
           store = AssetStore(
-              filename: store.filename,
-              destination: store.destination,
-              assets: [
-                AssetReferenceReference(
-                    variableName: 'firstFile',
-                    reference: AssetReference.file('file1.wav')),
-                AssetReferenceReference(
-                    variableName: 'firstDirectory',
-                    reference: AssetReference.collection('directory1'))
-              ]);
+            filename: store.filename,
+            destination: store.destination,
+            assets: [
+              const AssetReferenceReference(
+                variableName: 'firstFile',
+                reference: AssetReference.file('file1.wav'),
+              ),
+              const AssetReferenceReference(
+                variableName: 'firstDirectory',
+                reference: AssetReference.collection('directory1'),
+              )
+            ],
+          );
           expect(store.filename, equals('test.dart'));
           expect(store.destination, equals('assets'));
           expect(store.comment, isNull);
@@ -646,7 +692,7 @@ void main() {
       test(
         '.getNextFilename',
         () {
-          final store = AssetStore(
+          const store = AssetStore(
             filename: 'test.dart',
             destination: 'assets',
             assets: [],
@@ -670,7 +716,7 @@ void main() {
         '.getNextFilename with relativeTo',
         () {
           final storesDirectory = Directory('stores')..createSync();
-          final store = AssetStore(
+          const store = AssetStore(
             filename: 'store.dart',
             destination: 'first',
             assets: [],
@@ -707,7 +753,7 @@ void main() {
         '.getAbsoluteDirectory',
         () {
           final storeDirectory = Directory('assets')..createSync();
-          final store = AssetStore(
+          const store = AssetStore(
             filename: 'test.dart',
             destination: 'lovely_store',
             assets: [],
@@ -725,6 +771,7 @@ void main() {
       test(
         '.importFile',
         () {
+          // ignore: prefer_const_constructors
           final store = AssetStore(
             filename: 'test.dart',
             destination: 'test.importFile',
@@ -735,29 +782,42 @@ void main() {
           }
           final file = File('SDL2.dll');
           var reference = store.importFile(
-              source: file, variableName: 'sdlDll', comment: 'The SDL DLL.');
+            source: file,
+            variableName: 'sdlDll',
+            comment: 'The SDL DLL.',
+          );
           expect(reference, isA<AssetReferenceReference>());
           expect(store.directory.listSync().length, equals(1));
           final sdlDll = store.directory.listSync().first;
           expect(sdlDll, isA<File>());
           sdlDll as File;
           expect(
-              sdlDll.path, equals(path.join(store.destination, '0.encrypted')));
+            sdlDll.path,
+            equals(path.join(store.destination, '0.encrypted')),
+          );
           expect(store.assets.length, equals(1));
           expect(store.assets.first, equals(reference));
           expect(reference.variableName, equals('sdlDll'));
           expect(reference.comment, equals('The SDL DLL.'));
-          expect(reference.reference.name,
-              equals('${store.destination}/0.encrypted'));
+          expect(
+            reference.reference.name,
+            equals('${store.destination}/0.encrypted'),
+          );
           expect(reference.reference.type, equals(AssetType.file));
           expect(
-              reference.reference.load(random), equals(file.readAsBytesSync()));
+            reference.reference.load(random),
+            equals(file.readAsBytesSync()),
+          );
           reference = store.importFile(
-              source: File('pubspec.yaml'), variableName: 'pubSpec');
+            source: File('pubspec.yaml'),
+            variableName: 'pubSpec',
+          );
           expect(reference.variableName, equals('pubSpec'));
           expect(store.directory.listSync().length, equals(2));
-          expect(reference.reference.name,
-              equals('${store.destination}/1.encrypted'));
+          expect(
+            reference.reference.name,
+            equals('${store.destination}/1.encrypted'),
+          );
           store.directory.deleteSync(recursive: true);
         },
       );
@@ -765,6 +825,7 @@ void main() {
         '.importDirectory',
         () {
           final testDirectory = Directory('test');
+          // ignore: prefer_const_constructors
           final store = AssetStore(
             filename: 'test.dart',
             destination: 'test.importDirectory',
@@ -774,18 +835,19 @@ void main() {
             store.directory.deleteSync(recursive: true);
           }
           final reference = store.importDirectory(
-              source: testDirectory,
-              variableName: 'tests',
-              comment: 'Tests directory.');
+            source: testDirectory,
+            variableName: 'tests',
+            comment: 'Tests directory.',
+          );
           expect(reference, isA<AssetReferenceReference>());
           expect(reference.reference.name, equals('${store.destination}/0'));
           expect(store.assets.length, equals(1));
           expect(store.assets.first, equals(reference));
           final unencryptedEntities = testDirectory.listSync()
-            ..sort((a, b) => a.path.compareTo(b.path));
+            ..sort((final a, final b) => a.path.compareTo(b.path));
           final encryptedEntities = Directory(reference.reference.name)
               .listSync()
-            ..sort((a, b) => a.path.compareTo(b.path));
+            ..sort((final a, final b) => a.path.compareTo(b.path));
           expect(unencryptedEntities.length, equals(encryptedEntities.length));
           for (var i = 0; i < unencryptedEntities.length; i++) {
             final unencryptedFile = unencryptedEntities[i];
@@ -798,9 +860,12 @@ void main() {
             final encrypter = Encrypter(AES(key));
             final encrypted = Encrypted(encryptedFile.readAsBytesSync());
             final data = encrypter.decryptBytes(encrypted, iv: iv);
-            expect(data, equals(unencryptedFile.readAsBytesSync()),
-                reason: 'File ${encryptedFile.path} did not decrypt to '
-                    '${unencryptedFile.path}.');
+            expect(
+              data,
+              equals(unencryptedFile.readAsBytesSync()),
+              reason: 'File ${encryptedFile.path} did not decrypt to '
+                  '${unencryptedFile.path}.',
+            );
           }
           store.directory.deleteSync(recursive: true);
         },
@@ -808,6 +873,7 @@ void main() {
       test(
         'Import both',
         () {
+          // ignore: prefer_const_constructors
           final store = AssetStore(
             filename: 'test.dart',
             destination: 'assets',
@@ -835,6 +901,7 @@ void main() {
         'Import both with relative',
         () {
           final storeDirectory = Directory('assets')..createSync();
+          // ignore: prefer_const_constructors
           final store = AssetStore(
             filename: 'test.dart',
             destination: 'lovely_store',
@@ -863,8 +930,10 @@ void main() {
               relativeTo: storeDirectory,
             );
           expect(store.assets.length, equals(2));
-          expect(store.getAbsoluteDirectory(storeDirectory).listSync().length,
-              equals(2));
+          expect(
+            store.getAbsoluteDirectory(storeDirectory).listSync().length,
+            equals(2),
+          );
           storeDirectory.deleteSync(recursive: true);
         },
       );
@@ -878,20 +947,20 @@ void main() {
         () async {
           final channel = game.createSoundChannel();
           final wave = channel.playSine(a4);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(soundManager.getChannel(channel.id!), isNotNull);
           final generator = soundManager.getWave(wave.id!);
           expect(generator, isA<FastSineBankGenerator>());
           expect(generator.gain.value, wave.gain);
           expect(generator.frequency.value, wave.frequency);
           wave.gain = 0.5;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(generator.gain.value, 0.5);
           wave.frequency = c3;
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           expect(generator.frequency.value, c3);
           wave.automateFrequency(length: 0.5, endFrequency: a4);
-          await Future<void>.delayed(Duration(milliseconds: 700));
+          await Future<void>.delayed(const Duration(milliseconds: 700));
           expect(generator.frequency.value, a4);
           expect(wave.paused, isFalse);
           wave.pause();
@@ -899,18 +968,18 @@ void main() {
           wave.unpause();
           expect(wave.paused, isFalse);
           wave.fade(length: 0.5);
-          await Future<void>.delayed(Duration(milliseconds: 700));
+          await Future<void>.delayed(const Duration(milliseconds: 700));
           expect(generator.gain.value, isZero);
           final fade = wave.fade(length: 1.0, endGain: 1.0);
-          await Future<void>.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           final gain = generator.gain.value;
           expect(gain, inExclusiveRange(0, 1));
           fade.cancel();
-          await Future<void>.delayed(Duration(seconds: 1));
+          await Future<void>.delayed(const Duration(seconds: 1));
           final newGain = generator.gain.value;
           expect(newGain, greaterThanOrEqualTo(gain));
           wave.destroy();
-          await Future<void>.delayed(Duration(milliseconds: 900));
+          await Future<void>.delayed(const Duration(milliseconds: 900));
           expect(
             () => soundManager.getWave(wave.id!),
             throwsA(isA<NoSuchWaveError>()),
