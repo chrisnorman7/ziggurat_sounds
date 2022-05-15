@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.24.0]
+
+### Changed
+
+* Updated dependencies.
+* Updated minimum SDK constraints.
+
 ## [0.23.2]
 
 ### Changed
