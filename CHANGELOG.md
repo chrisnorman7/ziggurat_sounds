@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.28.1]
+
+### Added
+
+* Added basic usage instructions.
+
 ## [0.28.0]
 
 ### Changed
