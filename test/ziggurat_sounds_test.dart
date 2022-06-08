@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dart_sdl/dart_sdl.dart';
 import 'package:dart_synthizer/dart_synthizer.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as path;
@@ -16,6 +17,7 @@ import 'custom_buffer_store.dart';
 import 'custom_sound_manager.dart';
 
 void main() {
+  final sdl = Sdl();
   final synthizer = Synthizer()..initialize();
   final context = synthizer.createContext();
   tearDownAll(
@@ -25,7 +27,10 @@ void main() {
     },
   );
   final buffers = CustomBufferStore(Random(), synthizer);
-  final game = Game('Sounds');
+  final game = Game(
+    title: 'Sounds',
+    sdl: sdl,
+  );
   final random = game.random;
   final soundManager = CustomSoundManager(
     game: game,
@@ -39,7 +44,10 @@ void main() {
       test(
         'Ensure initialisation',
         () async {
-          final game = Game('Ensure Initialisation');
+          final game = Game(
+            title: 'Ensure Initialisation',
+            sdl: sdl,
+          );
           final events = <SoundEvent>[];
           game.sounds.listen(events.add);
           await Future<void>.delayed(Duration.zero);
@@ -453,7 +461,10 @@ void main() {
       test(
         'Toggling Reverbs',
         () async {
-          final game = Game('Replacement Game');
+          final game = Game(
+            title: 'Replacement Game',
+            sdl: sdl,
+          );
           final soundManager = CustomSoundManager(
             game: game,
             context: context,

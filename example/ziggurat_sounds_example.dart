@@ -3,11 +3,13 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dart_sdl/dart_sdl.dart';
 import 'package:dart_synthizer/dart_synthizer.dart';
 import 'package:ziggurat/ziggurat.dart';
 import 'package:ziggurat_sounds/ziggurat_sounds.dart';
 
 Future<void> main() async {
+  final sdl = Sdl();
   final synthizer = Synthizer()..initialize();
   final ctx = synthizer.createContext();
   print('Created audio context.');
@@ -17,7 +19,10 @@ Future<void> main() async {
   print('Added aim.wav.');
   await bufferStore.addFile(File('shot.wav'));
   print('Added shot.wav.');
-  final game = Game('Sounds Example');
+  final game = Game(
+    title: 'Sounds Example',
+    sdl: sdl,
+  );
   final soundManager = SoundManager(game: game, context: ctx)
     ..bufferStores.add(bufferStore);
   print('Created a sound manager.');
